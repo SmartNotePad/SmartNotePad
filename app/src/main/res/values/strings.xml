@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SmartNotePad</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="email_text">email</string>
+    <string name="password_text">password</string>
+    <string name="button_login">Logın</string>
+    <string name="button_register">register</string>
+    <string name="sign_up_text">Sign Up</string>
+    <string name="sign_in_text">Sign In</string>
+</resources>
