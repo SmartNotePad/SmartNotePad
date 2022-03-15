@@ -12,7 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 
-        <item name="android:fontFamily">@font/fredoka_regular</item>
+        <item name="android:fontFamily">@font/fredoka</item>
+
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
 

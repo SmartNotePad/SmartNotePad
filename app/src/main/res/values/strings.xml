@@ -7,4 +7,8 @@
     <string name="button_register">register</string>
     <string name="sign_up_text">Sign Up</string>
     <string name="sign_in_text">Sign In</string>
+    <string name="name_text">name</string>
+    <string name="confirm_password_text">Confirm Password</string>
+    <string name="actions">Actions</string>
+    <string name="none_note_text">Sit back, relax and use the blue button below to add a note.</string>
 </resources>
