@@ -5,8 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.tez.smartnotepad.data.model.NoteModel
 
-class NoteAdapter(private val notes: MutableList<NoteDAO>)
+class NoteAdapter(private val notes: MutableList<NoteModel>)
     : RecyclerView.Adapter<NoteAdapter.ViewHolder>() {
 
 

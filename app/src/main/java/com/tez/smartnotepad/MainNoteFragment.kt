@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.tez.smartnotepad.data.model.NoteModel
 
 
 class MainNoteFragment : Fragment() {
@@ -23,17 +23,17 @@ class MainNoteFragment : Fragment() {
         recyclerView=view.findViewById(R.id.recy)
         recyclerView.layoutManager=GridLayoutManager(context,2,RecyclerView.VERTICAL,false)
         val notes = mutableListOf(
-           NoteDAO(1,"asd","qwdas","asd"),
-            NoteDAO(2,"asd","qwdas","asd"),
-                    NoteDAO(1,"asd","qwdas","asd"),
-        NoteDAO(2,"asd","qwdas","asd"),
-        NoteDAO(1,"asd","qwdas","asd"),
-            NoteDAO(1,"asd","qwdas","asd"),
-            NoteDAO(2,"asd","qwdas","asd"),
-            NoteDAO(1,"asd","qwdas","asd"),
-            NoteDAO(2,"asd","qwdas","asd"),
-            NoteDAO(1,"asd","qwdas","asd"),
-        NoteDAO(2,"asd","qwdas","asd")
+           NoteModel(1,"asd","qwdas","asd"),
+            NoteModel(2,"asd","qwdas","asd"),
+                    NoteModel(1,"asd","qwdas","asd"),
+        NoteModel(2,"asd","qwdas","asd"),
+        NoteModel(1,"asd","qwdas","asd"),
+            NoteModel(1,"asd","qwdas","asd"),
+            NoteModel(2,"asd","qwdas","asd"),
+            NoteModel(1,"asd","qwdas","asd"),
+            NoteModel(2,"asd","qwdas","asd"),
+            NoteModel(1,"asd","qwdas","asd"),
+        NoteModel(2,"asd","qwdas","asd")
 
         )
         recyclerView.adapter=NoteAdapter(notes)
