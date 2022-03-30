@@ -12,4 +12,8 @@ interface UserService {
         @Body userModel: UserModel
     ): BaseResponseModel<UserModel>
 
+    @POST("users/login")
+    suspend fun login(
+        @Body userModel: UserModel
+    ): BaseResponseModel<UserModel>
 }

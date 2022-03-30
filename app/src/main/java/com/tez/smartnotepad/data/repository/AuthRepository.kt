@@ -1,9 +1,11 @@
 package com.tez.smartnotepad.data.repository
 
+import android.util.Log
 import com.tez.smartnotepad.data.ResultWrapper
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.data.datasource.remote.AuthRemoteDataSource
 import com.tez.smartnotepad.data.model.UserModel
+import com.tez.smartnotepad.vm.RegisterViewModel
 
 class AuthRepository (
     private val prefDataSource: PrefDataSource,
@@ -12,15 +14,17 @@ class AuthRepository (
     suspend fun register(userModel: UserModel): ResultWrapper<UserModel> {
         return authRemoteDataSource.register(userModel)
     }
-
+    suspend fun login(userModel: UserModel): ResultWrapper<UserModel> {
+        return authRemoteDataSource.login(userModel)
+    }
     fun isUserLogged(): Boolean = prefDataSource.isUserLogged()
 
-    fun saveUserIdToPref(userId: Int) {
-        prefDataSource.userId = userId
+    fun saveUserToPref(user: UserModel) {
+        prefDataSource.user = user
     }
     fun removeUserFromPref() {
-        prefDataSource.userId = 0
+        prefDataSource.removeUser()
     }
-    fun getUserId(): Int = prefDataSource.userId
-
+    fun getUserId(): String? =
+        if(prefDataSource.isUserLogged()) prefDataSource.user!!.userId else null
 }

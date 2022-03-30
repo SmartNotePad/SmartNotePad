@@ -9,4 +9,8 @@ class AuthRemoteDataSource(private val userService: UserService): BaseRemoteData
     suspend fun register(user: UserModel): ResultWrapper<UserModel>{
         return apiCall { userService.addUser(user) }
     }
+
+    suspend fun login(user: UserModel): ResultWrapper<UserModel>{
+        return apiCall { userService.login(user) }
+    }
 }
