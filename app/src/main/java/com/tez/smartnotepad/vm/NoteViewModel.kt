@@ -30,9 +30,14 @@ class NoteViewModel(private val noteRepository: NoteRepository): ViewModel() {
         viewModelScope.launch {
             when (val response = requestFunc.invoke()) {
                 is ResultWrapper.Success -> {
-                    Log.e(NoteViewModel::class.java.simpleName,"Notlar döndü")
                     Log.e(NoteViewModel::class.java.simpleName,response.value.toString())
-                    _notes.value = (response.value as List<NoteModel>)
+
+                    val responseNotes = response.value as List<NoteModel>
+
+                    if (responseNotes.isEmpty())
+                        _notes.value = emptyList()
+                    else
+                        _notes.value = responseNotes
                 }
                 is ResultWrapper.Error -> {
                     // TODO handle error
