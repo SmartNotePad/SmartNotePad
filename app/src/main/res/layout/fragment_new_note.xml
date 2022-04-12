@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/main_gray"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.note.NewNoteFragment">
+    tools:context=".ui.newnote.NewNoteFragment">
 
     <ImageButton
         android:layout_width="48dp"
@@ -23,7 +23,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/shareButton"
+        android:id="@+id/btnSaveNote"
         android:background="@drawable/search_corner"
         android:backgroundTint="@color/main_blue"
         app:layout_constraintTop_toTopOf="parent"

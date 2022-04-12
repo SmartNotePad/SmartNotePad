@@ -1,7 +1,6 @@
-package com.tez.smartnotepad.ui.note
+package com.tez.smartnotepad.ui.home
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,20 +12,21 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.api.ApiClient
 import com.tez.smartnotepad.data.datasource.remote.NoteRemoteDataSource
+import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.NoteRepository
 import com.tez.smartnotepad.network.service.NoteService
 import com.tez.smartnotepad.ui.adapter.note.NoteAdapter
-import com.tez.smartnotepad.util.ext.name
-import com.tez.smartnotepad.vm.NoteViewModel
+import com.tez.smartnotepad.ui.newnote.NewNoteFragment
+import com.tez.smartnotepad.ui.viewnote.ViewNoteFragment
+import com.tez.smartnotepad.vm.HomeViewModel
 
 
-class NoteFragment : Fragment() {
+class HomeFragment : Fragment() {
 
-    private lateinit var recyclerView:RecyclerView
     private lateinit var user:UserModel
 
-    private lateinit var noteViewModel: NoteViewModel
+    private lateinit var homeViewModel: HomeViewModel
     private lateinit var noteRepository: NoteRepository
     private lateinit var noteRemoteDataSource: NoteRemoteDataSource
     private lateinit var noteService: NoteService
@@ -35,14 +35,14 @@ class NoteFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        user = UserModel(userId="3", mail="string3", password="string3", nameSurname="string3")
+        user = UserModel(userId="3", mail="string3", password="string", nameSurname="string")
         apiClient = ApiClient
         noteService = apiClient.getClient().create(NoteService::class.java)
         noteRemoteDataSource = NoteRemoteDataSource(noteService)
         noteRepository = NoteRepository(user,noteRemoteDataSource)
-        noteViewModel = NoteViewModel(noteRepository)
+        homeViewModel = HomeViewModel(noteRepository)
 
-        noteViewModel.getAllNotesOfUser()
+        homeViewModel.getAllNotesOfUser()
     }
 
     override fun onCreateView(
@@ -53,27 +53,32 @@ class NoteFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_note, container, false)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recy)
         val tvZeroNoteInfo = view.findViewById<TextView>(R.id.tvZeroNoteInfo)
-        val btn_addNote_normal = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_normal_note)
+        val btnAddNoteNormal = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_normal_note)
 
         recyclerView.layoutManager = GridLayoutManager(context,2,RecyclerView.VERTICAL,false)
-        btn_addNote_normal.setOnClickListener {
+        btnAddNoteNormal.setOnClickListener {
             goNewNoteFragment()
         }
 
-        noteViewModel.notes.observe(viewLifecycleOwner){
+        homeViewModel.notes.observe(viewLifecycleOwner){
             if(it.isEmpty()) {
                 tvZeroNoteInfo.visibility = View.VISIBLE
                 recyclerView.visibility = View.INVISIBLE
             }else{
-                Log.e(name(),it.toString())
-                recyclerView.adapter = NoteAdapter(it)
-                /*
-                    tvZeroNoteInfo.visibility = View.INVISIBLE
-                    recyclerView.visibility = View.VISIBLE
-                */
+                recyclerView.adapter = NoteAdapter(it) {
+                    goViewNoteFragment(this)
+                }
             }
         }
         return view
+    }
+
+    private fun goViewNoteFragment(note: NoteModel) {
+        val viewNoteFragment = ViewNoteFragment.newInstance(note)
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragmentContainerView, viewNoteFragment)
+        transaction.addToBackStack(NewNoteFragment::class.java.simpleName)
+        transaction.commit()
     }
 
     private fun goNewNoteFragment() {
