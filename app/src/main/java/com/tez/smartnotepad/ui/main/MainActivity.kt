@@ -9,6 +9,7 @@ import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.ui.login.LoginFragment
 import com.tez.smartnotepad.ui.newnote.NewNoteFragment
+import com.tez.smartnotepad.ui.viewnote.ViewNoteFragment
 import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.vm.NewNoteViewModel
 
@@ -43,10 +44,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         while (supportFragmentManager.getBackStackEntryCount() > 0) {
-            if (supportFragmentManager.findFragmentById(R.id.container) is HomeFragment) {
+            if (supportFragmentManager.findFragmentById(R.id.fragmentContainerView) is HomeFragment) {
                 return
-            }else if (supportFragmentManager.findFragmentById(R.id.container) is NewNoteFragment){
-
             }
             getSupportFragmentManager().popBackStackImmediate()
         }

@@ -38,7 +38,7 @@ class NoteAdapter(private val notes: List<NoteModel>, private inline val onClick
 
     class NoteHolder(private val noteItemView: View): BaseHolder(noteItemView) {
 
-        override fun bindNote(note: NoteModel, onClickListener: NoteModel.() -> Unit) {
+        override fun bindNote(note: NoteModel, onClickListener: NoteModel.() -> Unit, ) {
             val tvTesT = noteItemView.findViewById<TextView>(R.id.tvNoteContent)
             tvTesT.text = note.contentsContentDtos?.first()?.context
 

@@ -2,6 +2,8 @@ package com.tez.smartnotepad.data.datasource.remote
 
 import com.tez.smartnotepad.data.ResultWrapper
 import com.tez.smartnotepad.data.model.ContentModel
+import com.tez.smartnotepad.data.model.NoteModel
+import com.tez.smartnotepad.data.model.ShareNoteModel
 import com.tez.smartnotepad.network.service.ContentService
 
 class ContentRemoteDataSource(private val contentService: ContentService) : BaseRemoteDataSource() {
@@ -38,4 +40,10 @@ class ContentRemoteDataSource(private val contentService: ContentService) : Base
 
     suspend fun getContentsOfNote(noteId: Int): ResultWrapper<MutableList<ContentModel>> =
         apiCall { contentService.getContentsOfNote(noteId) }
+
+    suspend fun shareNote(shareNoteModel: ShareNoteModel): ResultWrapper<NoteModel> =
+        apiCall { contentService.shareNote(shareNoteModel) }
+
+    suspend fun deleteNote(note: NoteModel) =
+        apiCall { contentService.deleteNote(note) }
 }
