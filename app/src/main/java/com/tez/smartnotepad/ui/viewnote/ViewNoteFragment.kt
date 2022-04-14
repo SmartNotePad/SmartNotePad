@@ -1,7 +1,6 @@
 package com.tez.smartnotepad.ui.viewnote
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -13,8 +12,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tez.smartnotepad.R
@@ -25,19 +22,13 @@ import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.ShareNoteModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.ContentRepository
-import com.tez.smartnotepad.network.helper.Request.makeNetworkRequest
 import com.tez.smartnotepad.network.service.ContentService
 import com.tez.smartnotepad.ui.adapter.content.ContentAdapter
-import com.tez.smartnotepad.ui.adapter.note.NoteAdapter
-import com.tez.smartnotepad.ui.main.MainActivity
 import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.vm.ViewNoteViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class ViewNoteFragment : Fragment() {
 
@@ -53,7 +44,7 @@ class ViewNoteFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments.let {
-            note = Json.decodeFromString<NoteModel>(it!!.getString("selectedNote").toString())
+            note = Json.decodeFromString(it!!.getString("selectedNote").toString())
         }
 
         val user =
@@ -150,7 +141,7 @@ class ViewNoteFragment : Fragment() {
         oldValue: String,
         getUpdatedContext: (updatedContext: String) -> Unit
     ) {
-        val builder: AlertDialog.Builder = android.app.AlertDialog.Builder(context)
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
         builder.setTitle("Edit Content")
         val input = EditText(context)
         input.inputType = InputType.TYPE_CLASS_TEXT

@@ -1,21 +1,17 @@
 package com.tez.smartnotepad.ui.main
 
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import com.tez.smartnotepad.ui.home.HomeFragment
+import androidx.appcompat.app.AppCompatActivity
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
+import com.tez.smartnotepad.ui.home.HomeFragment
 import com.tez.smartnotepad.ui.login.LoginFragment
-import com.tez.smartnotepad.ui.newnote.NewNoteFragment
-import com.tez.smartnotepad.ui.viewnote.ViewNoteFragment
 import com.tez.smartnotepad.util.ext.name
-import com.tez.smartnotepad.vm.NewNoteViewModel
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var prefDataSource: PrefDataSource
+    private lateinit var prefDataSource: PrefDataSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,11 +39,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        while (supportFragmentManager.getBackStackEntryCount() > 0) {
+        while (supportFragmentManager.backStackEntryCount > 0) {
             if (supportFragmentManager.findFragmentById(R.id.fragmentContainerView) is HomeFragment) {
                 return
             }
-            getSupportFragmentManager().popBackStackImmediate()
+            supportFragmentManager.popBackStackImmediate()
         }
     }
 }

@@ -4,11 +4,10 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.tez.smartnotepad.data.ResultWrapper
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.AuthRepository
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(private val authRepository: AuthRepository): ViewModel() {
@@ -35,7 +34,7 @@ class RegisterViewModel(private val authRepository: AuthRepository): ViewModel()
                 is ResultWrapper.Error -> {
                     // TODO handle error
                     Log.e(RegisterViewModel::class.java.simpleName,"Yeni üye Hata !!")
-                    Log.e(RegisterViewModel::class.java.simpleName,response.value.toString())
+                    Log.e(RegisterViewModel::class.java.simpleName,response.value)
                     _registerResult.value = false
                 }
             }

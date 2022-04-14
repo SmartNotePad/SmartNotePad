@@ -2,12 +2,11 @@ package com.tez.smartnotepad.ui.login
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
+import androidx.fragment.app.Fragment
 import com.google.android.material.textfield.TextInputEditText
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.api.ApiClient

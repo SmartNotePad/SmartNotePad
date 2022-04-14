@@ -9,8 +9,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 object ApiClient {
 
     private var retrofit: Retrofit? = null
-    var baseUrl: String = "http://192.168.1.20:8080/api/"
-    var logging: HttpLoggingInterceptor = HttpLoggingInterceptor()
+    private var baseUrl: String = "http://192.168.1.20:8080/api/"
+    private var logging: HttpLoggingInterceptor = HttpLoggingInterceptor()
 
 
     fun getClient(): Retrofit {

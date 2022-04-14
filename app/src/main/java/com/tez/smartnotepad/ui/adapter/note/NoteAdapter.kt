@@ -32,13 +32,13 @@ class NoteAdapter(private val notes: List<NoteModel>, private inline val onClick
         holder.bindNote(notes[position], onClickListener)
     }
 
-    abstract class BaseHolder(private val noteItemView: View): RecyclerView.ViewHolder(noteItemView){
+    abstract class BaseHolder(noteItemView: View): RecyclerView.ViewHolder(noteItemView){
         abstract fun bindNote(note: NoteModel, onClickListener: NoteModel.() -> Unit)
     }
 
     class NoteHolder(private val noteItemView: View): BaseHolder(noteItemView) {
 
-        override fun bindNote(note: NoteModel, onClickListener: NoteModel.() -> Unit, ) {
+        override fun bindNote(note: NoteModel, onClickListener: NoteModel.() -> Unit) {
             val tvTesT = noteItemView.findViewById<TextView>(R.id.tvNoteContent)
             tvTesT.text = note.contentsContentDtos?.first()?.context
 
@@ -48,7 +48,7 @@ class NoteAdapter(private val notes: List<NoteModel>, private inline val onClick
         }
     }
 
-    class EmptyNoteHolder(private val noteItemView: View): BaseHolder(noteItemView) {
+    class EmptyNoteHolder(noteItemView: View): BaseHolder(noteItemView) {
         override fun bindNote(note: NoteModel, onClickListener: NoteModel.() -> Unit) {}
     }
 

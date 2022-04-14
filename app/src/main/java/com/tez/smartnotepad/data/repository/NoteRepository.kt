@@ -1,6 +1,5 @@
 package com.tez.smartnotepad.data.repository
 
-import android.util.Log
 import com.tez.smartnotepad.data.ResultWrapper
 import com.tez.smartnotepad.data.datasource.remote.NoteRemoteDataSource
 import com.tez.smartnotepad.data.model.NoteModel

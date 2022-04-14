@@ -4,7 +4,6 @@ import com.tez.smartnotepad.data.ResultWrapper
 import com.tez.smartnotepad.data.model.BaseResponseModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.Response
 
 open class BaseRemoteDataSource {
 

@@ -10,7 +10,7 @@ import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.util.enums.ContentType
 import com.tez.smartnotepad.util.ext.inflate
 
-class ContentAdapter(var contents: MutableList<ContentModel>, private inline val onEditClickListener: ContentModel.(position: Int) -> Unit, private inline val onDeleteClickListener: ContentModel.(position: Int) -> Unit): RecyclerView.Adapter<ContentAdapter.BaseHolder>() {
+class ContentAdapter(private var contents: MutableList<ContentModel>, private inline val onEditClickListener: ContentModel.(position: Int) -> Unit, private inline val onDeleteClickListener: ContentModel.(position: Int) -> Unit): RecyclerView.Adapter<ContentAdapter.BaseHolder>() {
 
     override fun getItemViewType(position: Int): Int {
         return when (contents[position].type) {
@@ -28,7 +28,7 @@ class ContentAdapter(var contents: MutableList<ContentModel>, private inline val
         holder.bindContent(contents[position], position, onEditClickListener, onDeleteClickListener)
     }
 
-    abstract class BaseHolder(private val contentItemView: View): RecyclerView.ViewHolder(contentItemView) {
+    abstract class BaseHolder(contentItemView: View): RecyclerView.ViewHolder(contentItemView) {
         abstract fun bindContent(content: ContentModel, position: Int, onEditClickListener: ContentModel.(position:Int) -> Unit, onDeleteClickListener: ContentModel.(position: Int) -> Unit)
     }
 

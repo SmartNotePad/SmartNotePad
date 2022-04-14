@@ -1,6 +1,5 @@
 package com.tez.smartnotepad.vm
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +8,6 @@ import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.ShareNoteModel
 import com.tez.smartnotepad.data.repository.ContentRepository
 import com.tez.smartnotepad.network.helper.Request.makeNetworkRequest
-import kotlinx.coroutines.Dispatchers
 
 class ViewNoteViewModel(private val contentRepository: ContentRepository) : ViewModel() {
 

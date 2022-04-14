@@ -2,16 +2,12 @@ package com.tez.smartnotepad.ui.register
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.Fragment
 import com.google.android.material.textfield.TextInputEditText
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.api.ApiClient
@@ -55,10 +51,10 @@ class RegisterFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_register, container, false)
 
-        nameSurname = view.findViewById<TextInputEditText>(R.id.nameSubstituteWrap)
-        mail = view.findViewById<TextInputEditText>(R.id.emailSubstituteWrap)
-        password = view.findViewById<TextInputEditText>(R.id.passwordSubstituteCount)
-        passwordAgain = view.findViewById<TextInputEditText>(R.id.passwordCheckSubstituteCount)
+        nameSurname = view.findViewById(R.id.nameSubstituteWrap)
+        mail = view.findViewById(R.id.emailSubstituteWrap)
+        password = view.findViewById(R.id.passwordSubstituteCount)
+        passwordAgain = view.findViewById(R.id.passwordCheckSubstituteCount)
 
         val btnRegister = view.findViewById<Button>(R.id.registerButton)
 

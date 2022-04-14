@@ -34,7 +34,7 @@ class NewNoteViewModel(private val noteRepository: NoteRepository, private val c
         )
     }
 
-    fun updateNoteTitle(etTitle: EditText){
+    private fun updateNoteTitle(etTitle: EditText){
         makeNetworkRequest(
             requestFunc = {
                 noteRepository.updateNoteTitle(_note.value!!.copy(title = etTitle.text.toString()))

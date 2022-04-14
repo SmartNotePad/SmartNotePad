@@ -1,21 +1,17 @@
 package com.tez.smartnotepad.ui.home
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.api.ApiClient
 import com.tez.smartnotepad.data.datasource.remote.NoteRemoteDataSource
-import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.NoteRepository
@@ -23,7 +19,6 @@ import com.tez.smartnotepad.network.service.NoteService
 import com.tez.smartnotepad.ui.adapter.note.NoteAdapter
 import com.tez.smartnotepad.ui.newnote.NewNoteFragment
 import com.tez.smartnotepad.ui.viewnote.ViewNoteFragment
-import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.vm.HomeViewModel
 
 

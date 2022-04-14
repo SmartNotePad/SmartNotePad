@@ -25,7 +25,7 @@ class ContentRemoteDataSource(private val contentService: ContentService) : Base
                     "",
                     "",
                     "",
-                    2
+                    type
                 )
             )
         }
@@ -34,7 +34,7 @@ class ContentRemoteDataSource(private val contentService: ContentService) : Base
             : ResultWrapper<Any?> =
         apiCall { contentService.deleteContent(contentId) }
 
-    suspend fun updateontent(content: ContentModel)
+    suspend fun updateContent(content: ContentModel)
             : ResultWrapper<ContentModel> =
         apiCall { contentService.updateContent(content) }
 

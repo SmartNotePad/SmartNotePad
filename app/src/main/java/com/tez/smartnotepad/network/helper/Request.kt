@@ -3,7 +3,6 @@ package com.tez.smartnotepad.network.helper
 import android.util.Log
 import com.tez.smartnotepad.data.ResultWrapper
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object Request {
@@ -21,7 +20,7 @@ object Request {
                 is ResultWrapper.Error -> {
                     Log.e(Request::class.java.simpleName, "Hata oluştu")
                     Log.e(Request::class.java.simpleName, response.value)
-                    onError.invoke(response.value.toString())
+                    onError.invoke(response.value)
                 }
             }
         }
