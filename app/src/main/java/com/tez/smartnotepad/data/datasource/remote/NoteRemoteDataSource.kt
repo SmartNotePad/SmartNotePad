@@ -7,7 +7,7 @@ import com.tez.smartnotepad.network.service.NoteService
 
 class NoteRemoteDataSource(private val noteService: NoteService): BaseRemoteDataSource() {
 
-    suspend fun getAllNotesOfUser(userModel: UserModel): ResultWrapper<List<NoteModel>> {
+    suspend fun getAllNotesOfUser(userModel: UserModel): ResultWrapper<UserModel> {
         return apiCall { noteService.getAllNotesOfUser((userModel.userId).toInt()) }
     }
 

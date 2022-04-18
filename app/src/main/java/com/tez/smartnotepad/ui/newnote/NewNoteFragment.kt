@@ -44,7 +44,7 @@ class NewNoteFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        user = UserModel(userId="3", mail="string3", password="string", nameSurname="string")
+        user = UserModel(userId="3", mail="string3", password="string", nameSurname="string",null,null)
         apiClient = ApiClient
         noteService = apiClient.getClient().create(NoteService::class.java)
         contentService = apiClient.getClient().create(ContentService::class.java)

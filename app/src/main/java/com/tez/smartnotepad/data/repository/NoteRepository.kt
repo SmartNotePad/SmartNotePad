@@ -7,7 +7,7 @@ import com.tez.smartnotepad.data.model.UserModel
 
 class NoteRepository(private val user: UserModel, private val noteRemoteDataSource: NoteRemoteDataSource) {
 
-    suspend fun getAllNotesOfUser(): ResultWrapper<List<NoteModel>>{
+    suspend fun getAllNotesOfUser(): ResultWrapper<UserModel>{
         return noteRemoteDataSource.getAllNotesOfUser(user)
     }
 

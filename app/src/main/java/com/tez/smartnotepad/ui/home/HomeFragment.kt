@@ -37,7 +37,7 @@ class HomeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        user = UserModel(userId="3", mail="string3", password="string", nameSurname="string")
+        user = UserModel(userId="3", mail="string3", password="string", nameSurname="string",null,null)
         apiClient = ApiClient
         noteService = apiClient.getClient().create(NoteService::class.java)
         noteRemoteDataSource = NoteRemoteDataSource(noteService)
@@ -64,8 +64,8 @@ class HomeFragment : Fragment() {
             goNewNoteFragment()
         }
 
-        homeViewModel.getAllNotesOfUser { noteList ->
-            notes = noteList
+        homeViewModel.getAllNotesOfUser { user ->
+            notes = (user.sharedNotes as MutableList<NoteModel>)
             if(notes.isEmpty()) {
                 tvZeroNoteInfo.visibility = View.VISIBLE
                 recyclerView.visibility = View.INVISIBLE

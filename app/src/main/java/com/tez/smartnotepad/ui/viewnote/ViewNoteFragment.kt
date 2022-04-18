@@ -48,7 +48,7 @@ class ViewNoteFragment : Fragment() {
         }
 
         val user =
-            UserModel(userId = "3", mail = "string3", password = "string", nameSurname = "string")
+            UserModel(userId = "3", mail = "string3", password = "string", nameSurname = "string",null,null)
         apiClient = ApiClient
         contentService = apiClient.getClient().create(ContentService::class.java)
         contentRemoteDataSource = ContentRemoteDataSource(contentService)

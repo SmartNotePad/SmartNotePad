@@ -53,7 +53,7 @@ class LoginFragment : Fragment() {
         btnLogin = view.findViewById(R.id.loginButton)
 
         btnLogin.setOnClickListener {
-            loginViewModel.login(UserModel("",mail.text.toString(),password.text.toString(),""))
+            loginViewModel.login(UserModel("",mail.text.toString(),password.text.toString(),"",null,null))
         }
         return view
     }

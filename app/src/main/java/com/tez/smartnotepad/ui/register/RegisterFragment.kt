@@ -60,7 +60,7 @@ class RegisterFragment : Fragment() {
 
         btnRegister.setOnClickListener {
             if (check()){
-                val user = UserModel("0",mail.text.toString(),password.text.toString(),nameSurname.text.toString())
+                val user = UserModel("0",mail.text.toString(),password.text.toString(),nameSurname.text.toString(),null,null)
                 registerViewModel.register(user)
             }
         }
