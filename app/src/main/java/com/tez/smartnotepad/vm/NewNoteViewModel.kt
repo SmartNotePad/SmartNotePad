@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.ContentRepository
@@ -50,17 +51,30 @@ class NewNoteViewModel(private val noteRepository: NoteRepository, private val c
         )
     }
 
-    fun createContentAndUpdateTitle(etTitle: EditText,etContent: EditText, type: Int) {
+    fun createContentAndUpdateTitle(etTitle: EditText,etContent: EditText, type: Int,ownerUserId: String) {
+
+        val content = ContentModel(
+            0,
+            ownerUserId.toInt(),
+            "",
+            "",
+            _note.value!!.noteId,
+            etContent.text.toString(),
+            "",
+            "",
+            type
+        )
+
         makeNetworkRequest(
             requestFunc = {
-                contentRepository.createContent(etContent.text.toString(),type,_note.value!!.noteId)
+                contentRepository.createContent(content)
             },
             onSuccess = {
                 Log.e(NewNoteViewModel::class.java.simpleName + " - createContent ", it.toString())
                 updateNoteTitle(etTitle)
             },
             onError = {
-
+                Log.e(NewNoteViewModel::class.java.simpleName, " Hata !" + it)
             },
             viewModelScope
         )

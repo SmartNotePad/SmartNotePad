@@ -1,14 +1,19 @@
 package com.tez.smartnotepad.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.mlkit.vision.common.InputImage
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.api.ApiClient
 import com.tez.smartnotepad.data.datasource.remote.NoteRemoteDataSource
@@ -18,7 +23,9 @@ import com.tez.smartnotepad.data.repository.NoteRepository
 import com.tez.smartnotepad.network.service.NoteService
 import com.tez.smartnotepad.ui.adapter.note.NoteAdapter
 import com.tez.smartnotepad.ui.newnote.NewNoteFragment
+import com.tez.smartnotepad.ui.ocr.OcrFragment
 import com.tez.smartnotepad.ui.viewnote.ViewNoteFragment
+import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.HomeViewModel
 
 
@@ -33,11 +40,13 @@ class HomeFragment : Fragment() {
     private lateinit var apiClient: ApiClient
     private lateinit var noteAdapter: NoteAdapter
     private lateinit var notes : MutableList<NoteModel>
+    private var textFromOcrOrVoice: String = ""
+    private var intentActivityResultLauncher: ActivityResultLauncher<Intent>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        user = UserModel(userId="3", mail="string3", password="string", nameSurname="string",null,null)
+        user = UserModel(userId="3", mail="string2", password="string", nameSurname="string",null,null)
         apiClient = ApiClient
         noteService = apiClient.getClient().create(NoteService::class.java)
         noteRemoteDataSource = NoteRemoteDataSource(noteService)
@@ -52,16 +61,25 @@ class HomeFragment : Fragment() {
     ): View? {
         return inflater.inflate(R.layout.fragment_note, container, false)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recy)
         val tvZeroNoteInfo = view.findViewById<TextView>(R.id.tvZeroNoteInfo)
         val btnAddNoteNormal = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_normal_note)
+        val btnAddNoteWithCamera = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_camera)
 
         recyclerView.layoutManager = GridLayoutManager(context,2,RecyclerView.VERTICAL,false)
 
         btnAddNoteNormal.setOnClickListener {
             goNewNoteFragment()
+        }
+
+        btnAddNoteWithCamera.setOnClickListener {
+            val chooseIntent = Intent()
+            chooseIntent.type = "image/*"
+            chooseIntent.action = Intent.ACTION_GET_CONTENT
+            intentActivityResultLauncher?.launch(chooseIntent)
         }
 
         homeViewModel.getAllNotesOfUser { user ->
@@ -74,6 +92,26 @@ class HomeFragment : Fragment() {
                 recyclerView.adapter = noteAdapter
             }
         }
+
+        intentActivityResultLauncher =
+            registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult(),
+                ActivityResultCallback { result ->
+                    val data = result.data
+                    val imageUri = data?.data
+                    OcrUtils.convertImageToText(InputImage.fromFilePath(requireContext(),imageUri!!)){ text ->
+                        textFromOcrOrVoice = text
+                        goNewNoteFragment()
+                    }
+            })
+    }
+
+    private fun goOcrFragment() {
+        val ocrFragment = OcrFragment()
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragmentContainerView, ocrFragment)
+        transaction.addToBackStack(OcrFragment::class.java.simpleName)
+        transaction.commit()
     }
 
     private fun initAdapter(notes: List<NoteModel>): NoteAdapter {
@@ -91,7 +129,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun goNewNoteFragment() {
-        val newNoteFragment = NewNoteFragment()
+        val newNoteFragment = NewNoteFragment.newInstance(textFromOcrOrVoice)
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentContainerView, newNoteFragment)
         transaction.addToBackStack(NewNoteFragment::class.java.simpleName)

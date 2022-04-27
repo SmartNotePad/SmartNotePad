@@ -8,27 +8,9 @@ import com.tez.smartnotepad.network.service.ContentService
 
 class ContentRemoteDataSource(private val contentService: ContentService) : BaseRemoteDataSource() {
 
-    suspend fun createContent(
-        contentOwnerId: Int,
-        contentOfNoteId: Int,
-        content: String,
-        type: Int
-    ): ResultWrapper<ContentModel> =
-        apiCall {
-            contentService.createContent(
-                ContentModel(
-                    0,
-                    contentOwnerId,
-                    contentOfNoteId.toString(),
-                    content,
-                    0,
-                    "",
-                    "",
-                    "",
-                    type
-                )
-            )
-        }
+    suspend fun createContent(content: ContentModel)
+            : ResultWrapper<ContentModel> =
+        apiCall { contentService.createContent(content) }
 
     suspend fun deleteContent(contentId: Int)
             : ResultWrapper<Any?> =

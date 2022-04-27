@@ -14,9 +14,9 @@ class ContentRepository(
 ) {
 
     suspend fun createContent(
-        content: String, type: Int, noteId: Int
+        content: ContentModel
     ): ResultWrapper<ContentModel> =
-        contentRemoteDataSource.createContent(user.userId.toInt(), noteId, content, type)
+        contentRemoteDataSource.createContent(content)
 
     suspend fun deleteContent(contentId: Int)
             : ResultWrapper<Any?> =
@@ -36,5 +36,4 @@ class ContentRepository(
 
     suspend fun deleteNote(note: NoteModel)
         = contentRemoteDataSource.deleteNote(note)
-
 }

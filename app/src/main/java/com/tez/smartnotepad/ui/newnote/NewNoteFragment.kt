@@ -20,7 +20,7 @@ import com.tez.smartnotepad.network.service.ContentService
 import com.tez.smartnotepad.network.service.NoteService
 import com.tez.smartnotepad.vm.NewNoteViewModel
 
-class NewNoteFragment: Fragment() {
+class NewNoteFragment : Fragment() {
 
 
     private lateinit var user: UserModel
@@ -37,14 +37,26 @@ class NewNoteFragment: Fragment() {
 
     private lateinit var apiClient: ApiClient
     private lateinit var note: NoteModel
+    private lateinit var textFromOcrOrVoice: String
 
     /**
-    * fix the on back pressed
-    * */
+     * fix the on back pressed
+     * */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        user = UserModel(userId="3", mail="string3", password="string", nameSurname="string",null,null)
+        arguments.let {
+            textFromOcrOrVoice = it!!.getString("textFromOcrOrVoiceRecord", "")
+        }
+
+        user = UserModel(
+            userId = "3",
+            mail = "string2",
+            password = "string",
+            nameSurname = "string",
+            null,
+            null
+        )
         apiClient = ApiClient
         noteService = apiClient.getClient().create(NoteService::class.java)
         contentService = apiClient.getClient().create(ContentService::class.java)
@@ -52,10 +64,10 @@ class NewNoteFragment: Fragment() {
         noteRemoteDataSource = NoteRemoteDataSource(noteService)
         contentRemoteDataSource = ContentRemoteDataSource(contentService)
 
-        noteRepository = NoteRepository(user,noteRemoteDataSource)
-        contentRepository = ContentRepository(user,contentRemoteDataSource)
+        noteRepository = NoteRepository(user, noteRemoteDataSource)
+        contentRepository = ContentRepository(user, contentRemoteDataSource)
 
-        newNoteViewModel = NewNoteViewModel(noteRepository,contentRepository)
+        newNoteViewModel = NewNoteViewModel(noteRepository, contentRepository)
         newNoteViewModel.createEmptyNote(user)
     }
 
@@ -74,20 +86,33 @@ class NewNoteFragment: Fragment() {
         val etContent = view.findViewById<EditText>(R.id.noteContentText)
         val etNoteTitle = view.findViewById<EditText>(R.id.noteTitleText)
 
-        newNoteViewModel.note.observe(viewLifecycleOwner){
+        newNoteViewModel.note.observe(viewLifecycleOwner) {
             note = it
         }
 
+        if (textFromOcrOrVoice.isNotEmpty())
+            etContent.setText(textFromOcrOrVoice)
+
         btnSave.setOnClickListener {
-            newNoteViewModel.createContentAndUpdateTitle(etNoteTitle,etContent,2)
+            newNoteViewModel.createContentAndUpdateTitle(etNoteTitle, etContent, 2,user.userId)
         }
     }
 
     override fun onDetach() {
         super.onDetach()
-        if (note.contentsContentDtos.isNullOrEmpty()){
-            newNoteViewModel.deleteNote(note)
-            Log.e(NewNoteFragment::class.java.simpleName, note.toString())
-        }
+
+        if (this::note.isInitialized)
+            if (note.contentsContentDtos.isNullOrEmpty())
+                newNoteViewModel.deleteNote(note)
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(withNoteText: String?) =
+            NewNoteFragment().apply {
+                arguments = Bundle().apply {
+                    putString("textFromOcrOrVoiceRecord", withNoteText)
+                }
+            }
     }
 }
