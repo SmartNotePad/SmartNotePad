@@ -18,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.animation.content.Content
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.mlkit.vision.common.InputImage
 import com.tez.smartnotepad.R
@@ -59,7 +60,14 @@ class ViewNoteFragment : Fragment() {
         }
 
         val user =
-            UserModel(userId = "3", mail = "string2", password = "string", nameSurname = "string",null,null)
+            UserModel(
+                userId = "3",
+                mail = "string2",
+                password = "string",
+                nameSurname = "string",
+                null,
+                null
+            )
         apiClient = ApiClient
         contentService = apiClient.getClient().create(ContentService::class.java)
         contentRemoteDataSource = ContentRemoteDataSource(contentService)
@@ -87,6 +95,7 @@ class ViewNoteFragment : Fragment() {
         val btnAddContentWithCamera = view.findViewById<Button>(R.id.btnAddContentCamera)
 
         noteTitle.text = note.title
+
         rvContent.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         rvContent.setHasFixedSize(true)
@@ -119,17 +128,21 @@ class ViewNoteFragment : Fragment() {
                 ActivityResultCallback { result ->
                     val data = result.data
                     val imageUri = data?.data
-                    OcrUtils.convertImageToText(InputImage.fromFilePath(requireContext(),imageUri!!)){ text ->
+                    OcrUtils.convertImageToText(
+                        InputImage.fromFilePath(
+                            requireContext(),
+                            imageUri!!
+                        )
+                    ) { text ->
                         textFromOcrOrVoice = text
                         goNewContentFragment()
                     }
                 })
 
         btnAddContentNormal.setOnClickListener {
-
+            textFromOcrOrVoice = ""
+            goNewContentFragment()
         }
-
-
     }
 
     private fun initAdapter(): ContentAdapter {
@@ -138,41 +151,32 @@ class ViewNoteFragment : Fragment() {
             onEditClickListener = { position ->
                 showEditDialog(this.context) { newValue ->
                     val changed = this.copy(context = newValue)
-                    viewNoteViewModel.updateContent(changed, {
-                        updateContent(position, it)
-                    }, { error ->
-                        Log.e(name(), error)
-                    })
+                    updateContent(position, changed)
                 }
             },
             onDeleteClickListener = { position ->
-                viewNoteViewModel.deleteContent(this, {
-                    deleteContent(position)
-                }, {
-                    Log.e(name(), it)
-                })
+                deleteContent(position,this)
             })
     }
 
-    private fun updateContent(position: Int, updatedContent: ContentModel) {
-        viewNoteViewModel.getContentsOfNote(note.noteId, {
-            contents[position] = updatedContent
+    private fun updateContent(position: Int, changedContent: ContentModel) {
+        viewNoteViewModel.updateContent(changedContent, {
+            contents[position] = it
             contentAdapter.notifyItemChanged(position)
-        }, {
-            Log.e(name(), it)
+        }, { error ->
+            Log.e(name(), error)
         })
     }
 
-    private fun deleteContent(position: Int) {
-        if (contents.size == 1){
-            Toast.makeText(context,"This content was last. Note will be deleted after this content deleted.",Toast.LENGTH_LONG).show()
-            viewNoteViewModel.deleteNote(note)
-            destroyMe()
-        }else{
-            viewNoteViewModel.deleteContent(contents[position],{},{})
+    private fun deleteContent(position: Int, content: ContentModel) {
+
+        viewNoteViewModel.deleteContent(content, {
             contents.removeAt(position)
             contentAdapter.notifyItemRemoved(position)
-        }
+            Log.e("Silindi. Run Delete ($position)", content.context)
+        }, {
+            Log.e("Content silinirken Hata", it)
+        })
     }
 
     private fun showEditDialog(
@@ -189,8 +193,8 @@ class ViewNoteFragment : Fragment() {
         builder.setPositiveButton("OK") { _, _ ->
             getUpdatedContext(input.text.toString())
         }
-        builder.setNegativeButton("Cancel") {
-            dialog, _ -> dialog.cancel()
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
         }
         builder.show()
     }
@@ -207,27 +211,14 @@ class ViewNoteFragment : Fragment() {
         builder.setPositiveButton("OK") { _, _ ->
             getSharedUserMail(input.text.toString())
         }
-        builder.setNegativeButton("Cancel") {
-            dialog, _ -> dialog.cancel()
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
         }
         builder.show()
     }
 
-    private fun destroyMe(){
-        activity?.onBackPressed()
-    }
-
-    private fun updateMe(){
-
-        viewNoteViewModel.getContentsOfNote(note.noteId,{
-
-        }, {
-
-        })
-    }
-
     private fun goNewContentFragment() {
-        val newContentFragment = NewContentFragment.newInstance(textFromOcrOrVoice,note)
+        val newContentFragment = NewContentFragment.newInstance(textFromOcrOrVoice, note)
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentContainerView, newContentFragment)
         transaction.addToBackStack(NewContentFragment::class.java.simpleName)

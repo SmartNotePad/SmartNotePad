@@ -25,16 +25,16 @@ class ContentAdapter(private var contents: MutableList<ContentModel>, private in
     }
 
     override fun onBindViewHolder(holder: BaseHolder, position: Int) {
-        holder.bindContent(contents[position], position, onEditClickListener, onDeleteClickListener)
+        holder.bindContent(contents[position], onEditClickListener, onDeleteClickListener)
     }
 
     abstract class BaseHolder(contentItemView: View): RecyclerView.ViewHolder(contentItemView) {
-        abstract fun bindContent(content: ContentModel, position: Int, onEditClickListener: ContentModel.(position:Int) -> Unit, onDeleteClickListener: ContentModel.(position: Int) -> Unit)
+        abstract fun bindContent(content: ContentModel, onEditClickListener: ContentModel.(position:Int) -> Unit, onDeleteClickListener: ContentModel.(position: Int) -> Unit)
     }
 
     class TextContentHolder(private val contentItemView: View): BaseHolder(contentItemView){
 
-        override fun bindContent(content: ContentModel, position: Int,   onEditClickListener: ContentModel.(position:Int) -> Unit, onDeleteClickListener: ContentModel.(position: Int) -> Unit) {
+        override fun bindContent(content: ContentModel, onEditClickListener: ContentModel.(position:Int) -> Unit, onDeleteClickListener: ContentModel.(position: Int) -> Unit) {
 
             val contentText = contentItemView.findViewById<TextView>(R.id.tvContent)
             contentText.text = content.context
@@ -43,13 +43,12 @@ class ContentAdapter(private var contents: MutableList<ContentModel>, private in
             val ibDelete = contentItemView.findViewById<ImageButton>(R.id.ibContentDelete)
 
             ibEdit.setOnClickListener {
-                onEditClickListener.invoke(content,position)
+                onEditClickListener.invoke(content,adapterPosition)
             }
 
             ibDelete.setOnClickListener {
-                onDeleteClickListener(content,position)
+                onDeleteClickListener(content,adapterPosition)
             }
-
         }
     }
 

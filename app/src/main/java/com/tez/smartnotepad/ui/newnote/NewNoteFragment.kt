@@ -39,9 +39,6 @@ class NewNoteFragment : Fragment() {
     private lateinit var note: NoteModel
     private lateinit var textFromOcrOrVoice: String
 
-    /**
-     * fix the on back pressed
-     * */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -93,6 +90,7 @@ class NewNoteFragment : Fragment() {
         if (textFromOcrOrVoice.isNotEmpty())
             etContent.setText(textFromOcrOrVoice)
 
+        // TODO CLICKED MORE THAN ONCE? CHECK
         btnSave.setOnClickListener {
             newNoteViewModel.createContentAndUpdateTitle(etNoteTitle, etContent, 2,user.userId)
         }
@@ -106,6 +104,7 @@ class NewNoteFragment : Fragment() {
                 newNoteViewModel.deleteNote(note)
     }
 
+    // TODO YOU SHOULD CHANGE COMPANION OBJECT I GUESS. CHECK HERE. IMPORTANT
     companion object {
         @JvmStatic
         fun newInstance(withNoteText: String?) =

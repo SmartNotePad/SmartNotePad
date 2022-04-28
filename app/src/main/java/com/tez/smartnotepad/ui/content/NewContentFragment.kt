@@ -83,21 +83,14 @@ class NewContentFragment : Fragment() {
 
             newContentViewModel.addContent(user.userId, note.noteId, etContent, 2,
                 onSuccess = {
-                    goViewNoteFragment(note)
+                    activity?.onBackPressed()
+                    Log.e(name(), "Eklendi")
                 },
                 onError = {
                     Log.e(name(), "Eklenemedi")
                     Log.e(name(), it)
                 })
         }
-    }
-
-    private fun goViewNoteFragment(note: NoteModel) {
-        val viewNoteFragment = ViewNoteFragment.newInstance(note)
-        val transaction = requireActivity().supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragmentContainerView, viewNoteFragment)
-        transaction.addToBackStack(NewNoteFragment::class.java.simpleName)
-        transaction.commit()
     }
 
     companion object {

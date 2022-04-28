@@ -23,7 +23,6 @@ import com.tez.smartnotepad.data.repository.NoteRepository
 import com.tez.smartnotepad.network.service.NoteService
 import com.tez.smartnotepad.ui.adapter.note.NoteAdapter
 import com.tez.smartnotepad.ui.newnote.NewNoteFragment
-import com.tez.smartnotepad.ui.ocr.OcrFragment
 import com.tez.smartnotepad.ui.viewnote.ViewNoteFragment
 import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.HomeViewModel
@@ -59,7 +58,7 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_note, container, false)
+        return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -104,14 +103,6 @@ class HomeFragment : Fragment() {
                         goNewNoteFragment()
                     }
             })
-    }
-
-    private fun goOcrFragment() {
-        val ocrFragment = OcrFragment()
-        val transaction = requireActivity().supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragmentContainerView, ocrFragment)
-        transaction.addToBackStack(OcrFragment::class.java.simpleName)
-        transaction.commit()
     }
 
     private fun initAdapter(notes: List<NoteModel>): NoteAdapter {
