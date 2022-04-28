@@ -1,8 +1,10 @@
 package com.tez.smartnotepad.ui.viewnote
 
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,15 +13,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.airbnb.lottie.animation.content.Content
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.mlkit.vision.common.InputImage
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.api.ApiClient
@@ -32,13 +31,13 @@ import com.tez.smartnotepad.data.repository.ContentRepository
 import com.tez.smartnotepad.network.service.ContentService
 import com.tez.smartnotepad.ui.adapter.content.ContentAdapter
 import com.tez.smartnotepad.ui.content.NewContentFragment
-import com.tez.smartnotepad.ui.newnote.NewNoteFragment
 import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.ViewNoteViewModel
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.*
 
 class ViewNoteFragment : Fragment() {
 
@@ -93,6 +92,7 @@ class ViewNoteFragment : Fragment() {
         val btnShareNote = view.findViewById<Button>(R.id.btnShareNote)
         val btnAddContentNormal = view.findViewById<Button>(R.id.btnAddContentText)
         val btnAddContentWithCamera = view.findViewById<Button>(R.id.btnAddContentCamera)
+        val btnAddContentWithSpeech = view.findViewById<Button>(R.id.btnAddContentVoice)
 
         noteTitle.text = note.title
 
@@ -102,6 +102,38 @@ class ViewNoteFragment : Fragment() {
 
         contentAdapter = initAdapter()
         rvContent.adapter = contentAdapter
+
+        btnAddContentNormal.setOnClickListener {
+            textFromOcrOrVoice = ""
+            goNewContentFragment()
+        }
+
+        btnAddContentWithSpeech.setOnClickListener {
+            displaySpeechRecognizer()
+        }
+
+        btnAddContentWithCamera.setOnClickListener {
+            val chooseIntent = Intent()
+            chooseIntent.type = "image/*"
+            chooseIntent.action = Intent.ACTION_GET_CONTENT
+            intentActivityResultLauncher?.launch(chooseIntent)
+        }
+
+        intentActivityResultLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            val data = result.data
+            val imageUri = data?.data
+            OcrUtils.convertImageToText(
+                InputImage.fromFilePath(
+                    requireContext(),
+                    imageUri!!
+                )
+            ) { text ->
+                textFromOcrOrVoice = text
+                goNewContentFragment()
+            }
+        }
 
         btnShareNote.setOnClickListener {
             showShareDialog(
@@ -115,34 +147,6 @@ class ViewNoteFragment : Fragment() {
                 })
         }
 
-        btnAddContentWithCamera.setOnClickListener {
-            val chooseIntent = Intent()
-            chooseIntent.type = "image/*"
-            chooseIntent.action = Intent.ACTION_GET_CONTENT
-            intentActivityResultLauncher?.launch(chooseIntent)
-        }
-
-        intentActivityResultLauncher =
-            registerForActivityResult(
-                ActivityResultContracts.StartActivityForResult(),
-                ActivityResultCallback { result ->
-                    val data = result.data
-                    val imageUri = data?.data
-                    OcrUtils.convertImageToText(
-                        InputImage.fromFilePath(
-                            requireContext(),
-                            imageUri!!
-                        )
-                    ) { text ->
-                        textFromOcrOrVoice = text
-                        goNewContentFragment()
-                    }
-                })
-
-        btnAddContentNormal.setOnClickListener {
-            textFromOcrOrVoice = ""
-            goNewContentFragment()
-        }
     }
 
     private fun initAdapter(): ContentAdapter {
@@ -155,7 +159,7 @@ class ViewNoteFragment : Fragment() {
                 }
             },
             onDeleteClickListener = { position ->
-                deleteContent(position,this)
+                deleteContent(position, this)
             })
     }
 
@@ -216,6 +220,46 @@ class ViewNoteFragment : Fragment() {
         }
         builder.show()
     }
+
+
+    private val startForSpeechResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val spokenText: String? =
+                result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    .let { text -> text?.get(0) }
+
+            if (spokenText != null && spokenText.isNotEmpty()) {
+                textFromOcrOrVoice = spokenText
+                goNewContentFragment()
+            }
+        }
+    }
+
+    private fun displaySpeechRecognizer() {
+        startForSpeechResult.launch(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("en_US"))
+            putExtra(
+                RecognizerIntent.EXTRA_PROMPT,
+                Locale("Hi from the inside of the android on windows. Sanki inception.")
+            )
+        })
+    }
+
+/*    private val textToSpeechEngine: TextToSpeech by lazy {
+        TextToSpeech(activity) {
+            if (it == TextToSpeech.SUCCESS) textToSpeechEngine.language = Locale("en_US")
+        }
+    }
+
+    fun speak(text: String) = lifecycleScope.launch{
+        textToSpeechEngine.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+    }*/
 
     private fun goNewContentFragment() {
         val newContentFragment = NewContentFragment.newInstance(textFromOcrOrVoice, note)
