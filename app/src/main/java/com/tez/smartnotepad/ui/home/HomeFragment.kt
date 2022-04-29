@@ -1,7 +1,9 @@
 package com.tez.smartnotepad.ui.home
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +42,6 @@ class HomeFragment : Fragment() {
     private lateinit var noteAdapter: NoteAdapter
     private lateinit var notes : MutableList<NoteModel>
     private var textFromOcrOrVoice: String = ""
-    private var intentActivityResultLauncher: ActivityResultLauncher<Intent>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +51,7 @@ class HomeFragment : Fragment() {
         noteService = apiClient.getClient().create(NoteService::class.java)
         noteRemoteDataSource = NoteRemoteDataSource(noteService)
         noteRepository = NoteRepository(user,noteRemoteDataSource)
-        homeViewModel = HomeViewModel(noteRepository)
+        homeViewModel = HomeViewModel(noteRepository,startForSpeechResult,startForOcrResult)
     }
 
     override fun onCreateView(
@@ -67,6 +68,7 @@ class HomeFragment : Fragment() {
         val tvZeroNoteInfo = view.findViewById<TextView>(R.id.tvZeroNoteInfo)
         val btnAddNoteNormal = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_normal_note)
         val btnAddNoteWithCamera = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_camera)
+        val btnAddNoteWithVoice = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_voice)
 
         recyclerView.layoutManager = GridLayoutManager(context,2,RecyclerView.VERTICAL,false)
 
@@ -75,10 +77,11 @@ class HomeFragment : Fragment() {
         }
 
         btnAddNoteWithCamera.setOnClickListener {
-            val chooseIntent = Intent()
-            chooseIntent.type = "image/*"
-            chooseIntent.action = Intent.ACTION_GET_CONTENT
-            intentActivityResultLauncher?.launch(chooseIntent)
+            homeViewModel.displayOcr()
+        }
+
+        btnAddNoteWithVoice.setOnClickListener {
+            homeViewModel.displaySpeechRecognizer()
         }
 
         homeViewModel.getAllNotesOfUser { user ->
@@ -91,23 +94,42 @@ class HomeFragment : Fragment() {
                 recyclerView.adapter = noteAdapter
             }
         }
-
-        intentActivityResultLauncher =
-            registerForActivityResult(
-                ActivityResultContracts.StartActivityForResult(),
-                ActivityResultCallback { result ->
-                    val data = result.data
-                    val imageUri = data?.data
-                    OcrUtils.convertImageToText(InputImage.fromFilePath(requireContext(),imageUri!!)){ text ->
-                        textFromOcrOrVoice = text
-                        goNewNoteFragment()
-                    }
-            })
     }
 
     private fun initAdapter(notes: List<NoteModel>): NoteAdapter {
         return NoteAdapter(notes) {
             goViewNoteFragment(this)
+        }
+    }
+
+    private val startForSpeechResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val spokenText: String? =
+                result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    .let { text -> text?.get(0) }
+
+            if (spokenText != null && spokenText.isNotEmpty()) {
+                textFromOcrOrVoice = spokenText
+                goNewNoteFragment()
+            }
+        }
+    }
+
+    private val startForOcrResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val data = result.data
+        val imageUri = data?.data
+        OcrUtils.convertImageToText(
+            InputImage.fromFilePath(
+                requireContext(),
+                imageUri!!
+            )
+        ) { text ->
+            textFromOcrOrVoice = text
+            goNewNoteFragment()
         }
     }
 
