@@ -49,7 +49,6 @@ class ViewNoteFragment : Fragment() {
     private lateinit var apiClient: ApiClient
     private lateinit var contentAdapter: ContentAdapter
     private lateinit var contents: MutableList<ContentModel>
-    private var intentActivityResultLauncher: ActivityResultLauncher<Intent>? = null
     private var textFromOcrOrVoice: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +71,7 @@ class ViewNoteFragment : Fragment() {
         contentRemoteDataSource = ContentRemoteDataSource(contentService)
         contentRepository = ContentRepository(user, contentRemoteDataSource)
         viewNoteViewModel =
-            ViewNoteViewModel(contentRepository) // higher order funcs. buraya taşısam ?
+            ViewNoteViewModel(contentRepository,startForSpeechResult, startForOcrResult) // higher order funcs. buraya taşısam ?
         contents = note.contentsContentDtos!!
     }
 
@@ -109,31 +108,14 @@ class ViewNoteFragment : Fragment() {
         }
 
         btnAddContentWithSpeech.setOnClickListener {
-            displaySpeechRecognizer()
+            viewNoteViewModel.displaySpeechRecognizer()
         }
 
         btnAddContentWithCamera.setOnClickListener {
-            val chooseIntent = Intent()
-            chooseIntent.type = "image/*"
-            chooseIntent.action = Intent.ACTION_GET_CONTENT
-            intentActivityResultLauncher?.launch(chooseIntent)
+            viewNoteViewModel.displayOcr()
         }
 
-        intentActivityResultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            val data = result.data
-            val imageUri = data?.data
-            OcrUtils.convertImageToText(
-                InputImage.fromFilePath(
-                    requireContext(),
-                    imageUri!!
-                )
-            ) { text ->
-                textFromOcrOrVoice = text
-                goNewContentFragment()
-            }
-        }
+
 
         btnShareNote.setOnClickListener {
             showShareDialog(
@@ -237,18 +219,20 @@ class ViewNoteFragment : Fragment() {
         }
     }
 
-    private fun displaySpeechRecognizer() {
-        startForSpeechResult.launch(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+    private val startForOcrResult = registerForActivityResult(
+    ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val data = result.data
+        val imageUri = data?.data
+        OcrUtils.convertImageToText(
+            InputImage.fromFilePath(
+                requireContext(),
+                imageUri!!
             )
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("en_US"))
-            putExtra(
-                RecognizerIntent.EXTRA_PROMPT,
-                Locale("Hi from the inside of the android on windows. Sanki inception.")
-            )
-        })
+        ) { text ->
+            textFromOcrOrVoice = text
+            goNewContentFragment()
+        }
     }
 
 /*    private val textToSpeechEngine: TextToSpeech by lazy {
