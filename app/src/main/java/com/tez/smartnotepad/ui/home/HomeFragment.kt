@@ -1,151 +1,72 @@
 package com.tez.smartnotepad.ui.home
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import android.speech.RecognizerIntent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.mlkit.vision.common.InputImage
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.tez.smartnotepad.R
-import com.tez.smartnotepad.data.datasource.api.ApiClient
-import com.tez.smartnotepad.data.datasource.remote.NoteRemoteDataSource
-import com.tez.smartnotepad.data.model.NoteModel
-import com.tez.smartnotepad.data.model.UserModel
-import com.tez.smartnotepad.data.repository.NoteRepository
-import com.tez.smartnotepad.network.service.NoteService
-import com.tez.smartnotepad.ui.adapter.note.NoteAdapter
-import com.tez.smartnotepad.ui.newnote.NewNoteFragment
-import com.tez.smartnotepad.ui.viewnote.ViewNoteFragment
-import com.tez.smartnotepad.util.ocr.OcrUtils
-import com.tez.smartnotepad.vm.HomeViewModel
 
 
 class HomeFragment : Fragment() {
 
-    private lateinit var user:UserModel
-
-    private lateinit var homeViewModel: HomeViewModel
-    private lateinit var noteRepository: NoteRepository
-    private lateinit var noteRemoteDataSource: NoteRemoteDataSource
-    private lateinit var noteService: NoteService
-    private lateinit var apiClient: ApiClient
-    private lateinit var noteAdapter: NoteAdapter
-    private lateinit var notes : MutableList<NoteModel>
-    private var textFromOcrOrVoice: String = ""
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        user = UserModel(userId="3", mail="string2", password="string", nameSurname="string",null,null)
-        apiClient = ApiClient
-        noteService = apiClient.getClient().create(NoteService::class.java)
-        noteRemoteDataSource = NoteRemoteDataSource(noteService)
-        noteRepository = NoteRepository(user,noteRemoteDataSource)
-        homeViewModel = HomeViewModel(noteRepository,startForSpeechResult,startForOcrResult)
-    }
+    private lateinit var demoCollectionAdapter: DemoCollectionAdapter
+    private lateinit var viewPager: ViewPager2
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        return inflater.inflate(R.layout.fragment_home_base, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recy)
-        val tvZeroNoteInfo = view.findViewById<TextView>(R.id.tvZeroNoteInfo)
-        val btnAddNoteNormal = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_normal_note)
-        val btnAddNoteWithCamera = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_camera)
-        val btnAddNoteWithVoice = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_voice)
+        demoCollectionAdapter = DemoCollectionAdapter(this)
+        viewPager = view.findViewById(R.id.viewPager)
+        viewPager.adapter = demoCollectionAdapter
 
-        recyclerView.layoutManager = GridLayoutManager(context,2,RecyclerView.VERTICAL,false)
+        val tabLayout: TabLayout = view.findViewById(R.id.tab_layout)
 
-        btnAddNoteNormal.setOnClickListener {
-            goNewNoteFragment()
-        }
-
-        btnAddNoteWithCamera.setOnClickListener {
-            homeViewModel.displayOcr()
-        }
-
-        btnAddNoteWithVoice.setOnClickListener {
-            homeViewModel.displaySpeechRecognizer()
-        }
-
-        homeViewModel.getAllNotesOfUser { user ->
-            notes = (user.sharedNotes as MutableList<NoteModel>)
-            if(notes.isEmpty()) {
-                tvZeroNoteInfo.visibility = View.VISIBLE
-                recyclerView.visibility = View.INVISIBLE
-            }else{
-                noteAdapter = initAdapter(notes)
-                recyclerView.adapter = noteAdapter
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            val tabText = when (position) {
+                0 -> {
+                    "My Notes"
+                }
+                1 -> {
+                    "Shared Notes"
+                }
+                else -> {
+                    "Unknown Tab"
+                }
             }
-        }
-    }
-
-    private fun initAdapter(notes: List<NoteModel>): NoteAdapter {
-        return NoteAdapter(notes) {
-            goViewNoteFragment(this)
-        }
-    }
-
-    private val startForSpeechResult = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val spokenText: String? =
-                result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    .let { text -> text?.get(0) }
-
-            if (spokenText != null && spokenText.isNotEmpty()) {
-                textFromOcrOrVoice = spokenText
-                goNewNoteFragment()
-            }
-        }
-    }
-
-    private val startForOcrResult = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val data = result.data
-        val imageUri = data?.data
-        OcrUtils.convertImageToText(
-            InputImage.fromFilePath(
-                requireContext(),
-                imageUri!!
-            )
-        ) { text ->
-            textFromOcrOrVoice = text
-            goNewNoteFragment()
-        }
-    }
-
-    private fun goViewNoteFragment(note: NoteModel) {
-        val viewNoteFragment = ViewNoteFragment.newInstance(note)
-        val transaction = requireActivity().supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragmentContainerView, viewNoteFragment)
-        transaction.addToBackStack(NewNoteFragment::class.java.simpleName)
-        transaction.commit()
-    }
-
-    private fun goNewNoteFragment() {
-        val newNoteFragment = NewNoteFragment.newInstance(textFromOcrOrVoice)
-        val transaction = requireActivity().supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragmentContainerView, newNoteFragment)
-        transaction.addToBackStack(NewNoteFragment::class.java.simpleName)
-        transaction.commit()
+            
+            tab.text = tabText
+        }.attach()
     }
 }
+
+class DemoCollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+
+    override fun getItemCount(): Int = 2
+
+    override fun createFragment(position: Int): Fragment {
+        // Return a NEW fragment instance in createFragment(int)
+
+        Log.e("POSITION", position.toString())
+        return when (position) {
+            0 -> MyNotesFragment()
+            1 -> SharedNotesFragment()
+            else -> MyNotesFragment()
+        }
+
+    }
+}
+
+private const val ARG_OBJECT = "PAGE"

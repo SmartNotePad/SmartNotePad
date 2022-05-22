@@ -13,7 +13,7 @@
         android:id="@+id/backButton"
         android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
-        android:background="@drawable/search_corner"
+        android:background="@drawable/new_content_note_layout_corner"
         android:backgroundTint="@color/main_blue"
 
         android:src="@drawable/ic_baseline_arrow_back_24"
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnSaveNote"
-        android:background="@drawable/search_corner"
+        android:background="@drawable/new_content_note_layout_corner"
         android:backgroundTint="@color/main_blue"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="36dp"
-        android:background="@drawable/search_corner"
+        android:background="@drawable/new_content_note_layout_corner"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,7 +64,6 @@
             android:layout_marginTop="8dp"
             android:hint="Go ahead somethings"
             android:textSize="16dp" />
-
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

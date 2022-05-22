@@ -47,8 +47,8 @@ class NewContentFragment : Fragment() {
 
         user =
             UserModel(
-                userId = "3",
-                mail = "string2",
+                userId = "2",
+                mail = "string1",
                 password = "string",
                 nameSurname = "string",
                 null,

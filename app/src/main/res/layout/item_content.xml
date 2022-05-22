@@ -1,56 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="32dp"
-    android:background="@color/material_dynamic_tertiary90">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="10dp"
+    app:contentPadding="16dp"
+    app:cardBackgroundColor="@color/purple_100"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/stroke_color">
 
-    <TextView
-        android:id="@+id/tvContent"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
+        <TextView
         android:id="@+id/tvContentOwner"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="Berkhan"
-        app:layout_constraintEnd_toStartOf="@+id/ibContentEdit"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvContent" />
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        tools:text="Berkhan" />
 
-    <ImageButton
-        android:id="@+id/ibContentDelete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/ibContentEdit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/ibContentEdit"
-        app:layout_constraintTop_toTopOf="@+id/ibContentEdit"
-        app:srcCompat="@drawable/ic_baseline_delete_24" />
+        <TextView
+            android:id="@+id/tvContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/teal_700"
+            tools:text="Content Lorem impsum Lorem impsum Lorem impsum Lorem impsum Lorem impsum Lorem impsum Lorem impsum Lorem impsum Lorem impsum Lorem impsum"/>
 
-    <ImageButton
-        android:id="@+id/ibContentEdit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvContentOwner"
-        app:layout_constraintEnd_toStartOf="@+id/ibContentDelete"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/tvContentOwner"
-        app:layout_constraintTop_toTopOf="@+id/tvContentOwner"
-        app:srcCompat="@android:drawable/ic_menu_edit" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:weightSum="6"
+            android:gravity="bottom">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/tvLastModifiedDateLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/last_updated" />
+
+            <TextView
+                android:id="@+id/tvLastModifiedDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                tools:text="Berkhan" />
+
+            <ImageButton
+                android:id="@+id/ibContentDelete"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_baseline_delete_outline_24"
+                android:contentDescription="@string/delete_content"
+                android:layout_weight="0.5"/>
+
+            <ImageButton
+                android:id="@+id/ibContentEdit"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_baseline_edit_24"
+                android:contentDescription="@string/edit_content"
+                android:layout_weight="0.5"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

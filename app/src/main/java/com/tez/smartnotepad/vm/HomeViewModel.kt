@@ -2,9 +2,11 @@ package com.tez.smartnotepad.vm
 
 import android.content.Intent
 import android.speech.RecognizerIntent
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.NoteRepository
@@ -13,10 +15,11 @@ import java.util.*
 
 class HomeViewModel(private val noteRepository: NoteRepository, private val startForSpeechResult: ActivityResultLauncher<Intent>, private val startForOcrResult: ActivityResultLauncher<Intent>): ViewModel() {
 
-    fun getAllNotesOfUser(onSuccess: (user: UserModel) -> Unit){
+
+    fun getMyNotes(onSuccess: (notes: MutableList<NoteModel>) -> Unit){
         makeNetworkRequest(
             requestFunc = {
-                noteRepository.getAllNotesOfUser()
+                noteRepository.getMyNotes()
             },
             onSuccess = {
                 onSuccess.invoke(it)
@@ -26,6 +29,38 @@ class HomeViewModel(private val noteRepository: NoteRepository, private val star
             }, viewModelScope
         )
     }
+
+    fun getSharedNotesWithMe(onSuccess: (notes: MutableList<NoteModel>) -> Unit){
+        makeNetworkRequest(
+            requestFunc = {
+                noteRepository.getSharedNotesWithMe()
+            },
+            onSuccess = {
+                onSuccess.invoke(it)
+            },
+            onError = {
+
+            }, viewModelScope
+        )
+    }
+
+    fun deleteNote(
+        note: NoteModel,
+        onSuccess: () -> Unit,
+        onError: (error: String) -> Unit
+    ) {
+        makeNetworkRequest(
+            requestFunc = {
+                Log.e("Home ViewModel", note.title)
+                noteRepository.deleteNote(note)
+            }, onSuccess = {
+                onSuccess.invoke()
+            }, onError = {
+                onError.invoke(it)
+            }, viewModelScope
+        )
+    }
+
 
     fun displaySpeechRecognizer() {
         startForSpeechResult.launch(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {

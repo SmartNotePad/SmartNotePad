@@ -11,4 +11,20 @@
     <string name="confirm_password_text">Confirm Password</string>
     <string name="actions">Actions</string>
     <string name="none_note_text">Sit back, relax and use the blue button below to add a note.</string>
+    <string name="profile">Profile</string>
+    <string name="delete_note">Delete Note</string>
+    <string name="open_menu">open_menu</string>
+    <string name="text_from_ocr">Scan text</string>
+    <string name="text_from_speech">text_from_speech</string>
+    <string name="text_from_writing">Take a Note</string>
+    <string name="delete_content">Delete Content</string>
+    <string name="edit_content">Edit Content</string>
+    <string name="last_updated">Last updated</string>
+    <string name="share_note">Share Note</string>
+    <string name="add_with_camera">+ Camera</string>
+    <string name="add_with_text">+ Text</string>
+    <string name="add_with_voice">+ Voice</string>
+    <string name="confirm">Confirm</string>
+    <string name="go_ahead_somethings">Go ahead somethings</string>
+    <string name="new_content">New Content</string>
 </resources>

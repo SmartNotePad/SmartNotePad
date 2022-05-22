@@ -7,8 +7,12 @@ import com.tez.smartnotepad.data.model.UserModel
 
 class NoteRepository(private val user: UserModel, private val noteRemoteDataSource: NoteRemoteDataSource) {
 
-    suspend fun getAllNotesOfUser(): ResultWrapper<UserModel>{
-        return noteRemoteDataSource.getAllNotesOfUser(user)
+    suspend fun getMyNotes(): ResultWrapper<MutableList<NoteModel>>{
+        return noteRemoteDataSource.getMyNotes(user)
+    }
+
+    suspend fun getSharedNotesWithMe(): ResultWrapper<MutableList<NoteModel>>{
+        return noteRemoteDataSource.getSharedNotesWithMe(user)
     }
 
     suspend fun createEmptyNote(user: UserModel): ResultWrapper<NoteModel> {
@@ -18,4 +22,7 @@ class NoteRepository(private val user: UserModel, private val noteRemoteDataSour
     suspend fun updateNoteTitle(note: NoteModel): ResultWrapper<NoteModel> {
         return noteRemoteDataSource.updateNoteTitle(note)
     }
+
+    suspend fun deleteNote(note: NoteModel)
+            = noteRemoteDataSource.deleteNote(note)
 }

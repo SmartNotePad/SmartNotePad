@@ -7,10 +7,15 @@ import retrofit2.http.*
 
 interface NoteService {
 
-    @GET("users/get-by-id")
-    suspend fun getAllNotesOfUser(
+    @GET("notes/get-all-by-owner-user-id")
+    suspend fun getMyNotes(
         @Query("id") userId: Int
-    ): BaseResponseModel<UserModel>
+    ): BaseResponseModel<MutableList<NoteModel>>
+
+    @GET("notes/get-all-by-shared-notes-user-id")
+    suspend fun getSharedNotesWithMe(
+        @Query("id") userId: Int
+    ): BaseResponseModel<MutableList<NoteModel>>
 
     @POST("notes/add")
     suspend fun createNoteWithoutContent(
@@ -21,4 +26,9 @@ interface NoteService {
     suspend fun updateNoteTitle(
         @Body note: NoteModel
     ): BaseResponseModel<NoteModel>
+
+    @HTTP(method = "DELETE", path = "notes/delete", hasBody = true)
+    suspend fun deleteNote(
+        @Body note: NoteModel
+    ): BaseResponseModel<Any?>
 }
