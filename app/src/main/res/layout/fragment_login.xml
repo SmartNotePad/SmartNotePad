@@ -15,15 +15,14 @@
         android:layout_marginTop="52dp"
         android:text="@string/app_name"
         android:textSize="28sp"
-        android:textColor="@color/main_blue"
-        android:textStyle="bold"
+        android:textColor="@color/teal_700"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/buttonBackground"
+        android:id="@+id/ibtnBg"
         android:layout_marginTop="8dp"
         android:layout_width="250dp"
         android:layout_height="36dp"
@@ -38,36 +37,33 @@
         android:id="@+id/signUpTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sign Up"
-        android:textStyle="bold"
+        android:text="@string/sign_in"
         android:textSize="14sp"
         android:layout_marginEnd="40dp"
-        app:layout_constraintTop_toTopOf="@id/buttonBackground"
-        app:layout_constraintBottom_toBottomOf="@id/buttonBackground"
-        app:layout_constraintEnd_toEndOf="@id/buttonBackground" />
+        app:layout_constraintTop_toTopOf="@id/ibtnBg"
+        app:layout_constraintBottom_toBottomOf="@id/ibtnBg"
+        app:layout_constraintEnd_toEndOf="@id/ibtnBg" />
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/btnSignUpFromInLogin"
         android:layout_width="wrap_content"
-        android:layout_height="42dp"
+        android:layout_height="48dp"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
-        android:text="Sign In"
+        android:text="@string/sign_up"
         android:textAllCaps="false"
         android:textSize="14sp"
-        android:textStyle="bold"
         app:cornerRadius="22dp"
-        app:layout_constraintBottom_toBottomOf="@id/buttonBackground"
-        app:layout_constraintStart_toStartOf="@id/buttonBackground"
-        app:layout_constraintTop_toTopOf="@id/buttonBackground" />
-
-
+        app:layout_constraintBottom_toBottomOf="@id/ibtnBg"
+        app:layout_constraintStart_toStartOf="@id/ibtnBg"
+        app:layout_constraintTop_toTopOf="@id/ibtnBg" />
 
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher_background"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_baseline_account_circle_24"
+        android:tint="@color/teal_200"
         app:layout_constraintBottom_toTopOf="@+id/emailSubstitute"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +74,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="@string/email_text"
+        android:hint="@string/email"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline3">
@@ -96,7 +92,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="@string/password_text"
+        android:hint="@string/passwor"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -105,9 +101,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSubstituteCount"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberPassword"
-            android:maxLength="3" />
+            android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -125,7 +119,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/button_login"
+        android:text="@string/login"
         app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/passwordSubstitute"

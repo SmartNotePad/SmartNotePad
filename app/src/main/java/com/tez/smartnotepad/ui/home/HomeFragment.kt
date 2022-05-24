@@ -2,15 +2,16 @@ package com.tez.smartnotepad.ui.home
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tez.smartnotepad.R
+import com.tez.smartnotepad.ui.profile.ProfileFragment
 
 
 class HomeFragment : Fragment() {
@@ -23,11 +24,16 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_home_base, container, false)
+        val view = inflater.inflate(R.layout.fragment_home_base, container, false)
+
+
+
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         demoCollectionAdapter = DemoCollectionAdapter(this)
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = demoCollectionAdapter
@@ -46,9 +52,35 @@ class HomeFragment : Fragment() {
                     "Unknown Tab"
                 }
             }
-            
+
             tab.text = tabText
         }.attach()
+
+
+        val materialToolbar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
+
+        materialToolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menuProfile -> {
+                    Toast.makeText(requireContext(), "Dıklandım", Toast.LENGTH_SHORT).show()
+                    goProfileFragment()
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
+            }
+        }
+    }
+
+    private fun goProfileFragment() {
+        val profileFragment = ProfileFragment()
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragmentContainerView, profileFragment)
+        transaction.addToBackStack(ProfileFragment::class.java.simpleName)
+        transaction.commit()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.top_app_bar, menu)
     }
 }
 
@@ -68,5 +100,3 @@ class DemoCollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
 
     }
 }
-
-private const val ARG_OBJECT = "PAGE"

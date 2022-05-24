@@ -13,14 +13,12 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.mlkit.vision.common.InputImage
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.api.ApiClient
 import com.tez.smartnotepad.data.datasource.remote.NoteRemoteDataSource
-import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.NoteRepository
@@ -89,10 +87,10 @@ class MyNotesFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recy)
         val tvZeroNoteInfo = view.findViewById<TextView>(R.id.tvZeroNoteInfo)
 
-        btnAddNote = view.findViewById<FloatingActionButton>(R.id.fab_menu_actions)
-        btnAddNoteNormal = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_normal_note)
-        btnAddNoteWithCamera = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_camera)
-        btnAddNoteWithVoice = view.findViewById<FloatingActionButton>(R.id.fab_menu_add_voice)
+        btnAddNote = view.findViewById(R.id.fab_menu_actions)
+        btnAddNoteNormal = view.findViewById(R.id.fab_menu_add_normal_note)
+        btnAddNoteWithCamera = view.findViewById(R.id.fab_menu_add_camera)
+        btnAddNoteWithVoice = view.findViewById(R.id.fab_menu_add_voice)
 
         recyclerView.layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
 
@@ -213,7 +211,7 @@ class MyNotesFragment : Fragment() {
         val viewNoteFragment = ViewNoteFragment.newInstance(note)
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentContainerView, viewNoteFragment)
-        transaction.addToBackStack(NewNoteFragment::class.java.simpleName)
+        transaction.addToBackStack(ViewNoteFragment::class.java.simpleName)
         transaction.commit()
     }
 

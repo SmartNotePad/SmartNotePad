@@ -57,12 +57,17 @@ class RegisterFragment : Fragment() {
         passwordAgain = view.findViewById(R.id.passwordCheckSubstituteCount)
 
         val btnRegister = view.findViewById<Button>(R.id.registerButton)
+        val btnSignInFromInRegister = view.findViewById<Button>(R.id.btnSignInFromInRegister)
 
         btnRegister.setOnClickListener {
             if (check()){
                 val user = UserModel("0",mail.text.toString(),password.text.toString(),nameSurname.text.toString(),null,null)
                 registerViewModel.register(user)
             }
+        }
+
+        btnSignInFromInRegister.setOnClickListener {
+            goLoginFragment()
         }
 
         registerViewModel.registerResult.observe(viewLifecycleOwner) {

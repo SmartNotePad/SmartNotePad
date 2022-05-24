@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">SmartNotePad</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="email_text">email</string>
-    <string name="password_text">password</string>
-    <string name="button_login">Logın</string>
-    <string name="button_register">register</string>
+    <string name="email">Email</string>
+    <string name="passwor">password</string>
+    <string name="login">Logın</string>
+    <string name="register">register</string>
     <string name="sign_up_text">Sign Up</string>
     <string name="sign_in_text">Sign In</string>
-    <string name="name_text">name</string>
+    <string name="name">Name</string>
     <string name="confirm_password_text">Confirm Password</string>
     <string name="actions">Actions</string>
     <string name="none_note_text">Sit back, relax and use the blue button below to add a note.</string>
@@ -27,4 +27,11 @@
     <string name="confirm">Confirm</string>
     <string name="go_ahead_somethings">Go ahead somethings</string>
     <string name="new_content">New Content</string>
+    <string name="new_value">New Value</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
+    <string name="my_notes">My Notes</string>
+    <string name="shared_note">Shared Notes</string>
+    <string name="update">Update</string>
+    <string name="logout">Logout</string>
 </resources>

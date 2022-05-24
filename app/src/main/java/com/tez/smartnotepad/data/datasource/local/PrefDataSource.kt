@@ -22,7 +22,7 @@ class PrefDataSource(private val sharedPref: SharedPreferences) {
 
     fun isUserLogged(): Boolean {
         Log.e(PrefDataSource::class.java.simpleName,user.toString())
-        return user.toString().isNotEmpty()
+        return user != null
     }
 
     /*

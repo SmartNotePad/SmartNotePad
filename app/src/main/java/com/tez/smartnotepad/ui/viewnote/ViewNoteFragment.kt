@@ -2,7 +2,6 @@ package com.tez.smartnotepad.ui.viewnote
 
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.text.InputType
@@ -13,8 +12,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,13 +28,13 @@ import com.tez.smartnotepad.data.repository.ContentRepository
 import com.tez.smartnotepad.network.service.ContentService
 import com.tez.smartnotepad.ui.adapter.content.ContentAdapter
 import com.tez.smartnotepad.ui.content.NewContentFragment
+import com.tez.smartnotepad.ui.dialog.GeneralDialogFragment
 import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.ViewNoteViewModel
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.util.*
 
 class ViewNoteFragment : Fragment() {
 
@@ -71,7 +68,11 @@ class ViewNoteFragment : Fragment() {
         contentRemoteDataSource = ContentRemoteDataSource(contentService)
         contentRepository = ContentRepository(user, contentRemoteDataSource)
         viewNoteViewModel =
-            ViewNoteViewModel(contentRepository,startForSpeechResult, startForOcrResult) // higher order funcs. buraya taşısam ?
+            ViewNoteViewModel(
+                contentRepository,
+                startForSpeechResult,
+                startForOcrResult
+            ) // higher order funcs. buraya taşısam ?
         contents = note.contentsContentDtos!!
     }
 
@@ -116,29 +117,23 @@ class ViewNoteFragment : Fragment() {
         }
 
 
-
         btnShareNote.setOnClickListener {
-            showShareDialog(
-                getSharedUserMail = { mail ->
-                    viewNoteViewModel.shareNote(ShareNoteModel(note.userUserId, note.noteId, mail),
-                        {
-                            Log.e(name(), it.toString())
-                        }, {
-                            Log.e(name(), it)
-                        })
-                })
+            showShareDialog(onPositive = { mail ->
+                shareNote(mail)
+            })
         }
-
     }
 
     private fun initAdapter(): ContentAdapter {
         return ContentAdapter(
             contents,
             onEditClickListener = { position ->
-                showEditDialog(this.context) { newValue ->
-                    val changed = this.copy(context = newValue)
-                    updateContent(position, changed)
-                }
+                showEditDialog(
+                    this.context,
+                    onPositive = {
+                        val changed = this.copy(context = it)
+                        updateContent(position, changed)
+                    })
             },
             onDeleteClickListener = { position ->
                 deleteContent(position, this)
@@ -155,7 +150,6 @@ class ViewNoteFragment : Fragment() {
     }
 
     private fun deleteContent(position: Int, content: ContentModel) {
-
         viewNoteViewModel.deleteContent(content, {
             contents.removeAt(position)
             contentAdapter.notifyItemRemoved(position)
@@ -165,44 +159,24 @@ class ViewNoteFragment : Fragment() {
         })
     }
 
-    private fun showEditDialog(
-        oldValue: String,
-        getUpdatedContext: (updatedContext: String) -> Unit
-    ) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-        builder.setTitle("Edit Content")
-        val input = EditText(context)
-        input.inputType = InputType.TYPE_CLASS_TEXT
-        input.setText(oldValue)
-        builder.setView(input)
-
-        builder.setPositiveButton("OK") { _, _ ->
-            getUpdatedContext(input.text.toString())
-        }
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.cancel()
-        }
-        builder.show()
+    private fun shareNote(mail:String){
+        viewNoteViewModel.shareNote(ShareNoteModel(note.userUserId, note.noteId, mail),
+            {
+                Log.e(name(), it.toString())
+            }, {
+                Log.e(name(), it)
+            })
     }
 
-    private fun showShareDialog(
-        getSharedUserMail: (mail: String) -> Unit
-    ) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-        builder.setTitle("Enter User Mail")
-        val input = EditText(context)
-        input.inputType = InputType.TYPE_CLASS_TEXT
-        builder.setView(input)
-
-        builder.setPositiveButton("OK") { _, _ ->
-            getSharedUserMail(input.text.toString())
-        }
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.cancel()
-        }
-        builder.show()
+    private fun showEditDialog(oldValue: String, onPositive: (value: String) -> Unit) {
+        val dialogFragment = GeneralDialogFragment(oldValue) { onPositive.invoke(it) }
+        dialogFragment.show(childFragmentManager, "Edit")
     }
 
+    private fun showShareDialog(onPositive: (value: String) -> Unit) {
+        val dialogFragment = GeneralDialogFragment(null) { onPositive.invoke(it) }
+        dialogFragment.show(childFragmentManager, "Share")
+    }
 
     private val startForSpeechResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -220,7 +194,7 @@ class ViewNoteFragment : Fragment() {
     }
 
     private val startForOcrResult = registerForActivityResult(
-    ActivityResultContracts.StartActivityForResult()
+        ActivityResultContracts.StartActivityForResult()
     ) { result ->
         val data = result.data
         val imageUri = data?.data
@@ -234,16 +208,6 @@ class ViewNoteFragment : Fragment() {
             goNewContentFragment()
         }
     }
-
-/*    private val textToSpeechEngine: TextToSpeech by lazy {
-        TextToSpeech(activity) {
-            if (it == TextToSpeech.SUCCESS) textToSpeechEngine.language = Locale("en_US")
-        }
-    }
-
-    fun speak(text: String) = lifecycleScope.launch{
-        textToSpeechEngine.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
-    }*/
 
     private fun goNewContentFragment() {
         val newContentFragment = NewContentFragment.newInstance(textFromOcrOrVoice, note)

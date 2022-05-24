@@ -14,18 +14,22 @@ class LoginViewModel(private val authRepository: AuthRepository): ViewModel() {
     val user: UserModel
         get()  = _user
 
-    fun login(userModel: UserModel) {
+    fun login(userModel: UserModel, onSucces: () -> Unit) {
         makeNetworkRequest(
-            requestFunc = { authRepository.login(userModel) }
+            requestFunc = { authRepository.login(userModel) },{
+                onSucces.invoke()
+            }
         )
     }
     private fun <T> makeNetworkRequest(
-        requestFunc: suspend () -> ResultWrapper<T>
+        requestFunc: suspend () -> ResultWrapper<T>,
+        onSucces: () -> Unit
     ) {
         viewModelScope.launch {
             when (val response = requestFunc.invoke()) {
                 is ResultWrapper.Success -> {
                     authRepository.saveUserToPref((response.value as UserModel))
+                    onSucces.invoke()
                 }
                 is ResultWrapper.Error -> {
                     // TODO error handle

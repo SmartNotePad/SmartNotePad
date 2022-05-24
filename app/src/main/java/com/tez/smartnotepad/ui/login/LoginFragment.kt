@@ -15,6 +15,8 @@ import com.tez.smartnotepad.data.datasource.remote.AuthRemoteDataSource
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.AuthRepository
 import com.tez.smartnotepad.network.service.UserService
+import com.tez.smartnotepad.ui.home.HomeFragment
+import com.tez.smartnotepad.ui.register.RegisterFragment
 import com.tez.smartnotepad.vm.LoginViewModel
 
 class LoginFragment : Fragment() {
@@ -27,18 +29,20 @@ class LoginFragment : Fragment() {
     private lateinit var apiClient: ApiClient
     private lateinit var mail: TextInputEditText
     private lateinit var password: TextInputEditText
+    private lateinit var btnSignInFromInLogin: Button
     private lateinit var btnLogin: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        prefDataSource = PrefDataSource(requireContext().getSharedPreferences("SMART", Context.MODE_PRIVATE))
+        prefDataSource =
+            PrefDataSource(requireContext().getSharedPreferences("SMART", Context.MODE_PRIVATE))
 
         apiClient = ApiClient
         userService = apiClient.getClient().create(UserService::class.java)
         authRemoteDataSource = AuthRemoteDataSource(userService)
 
-        authRepository = AuthRepository(prefDataSource,authRemoteDataSource)
+        authRepository = AuthRepository(prefDataSource, authRemoteDataSource)
         loginViewModel = LoginViewModel(authRepository)
     }
 
@@ -50,12 +54,42 @@ class LoginFragment : Fragment() {
 
         mail = view.findViewById(R.id.emailSubstituteWrap)
         password = view.findViewById(R.id.etSubstituteCount)
+        btnSignInFromInLogin = view.findViewById(R.id.btnSignUpFromInLogin)
         btnLogin = view.findViewById(R.id.loginButton)
 
         btnLogin.setOnClickListener {
-            loginViewModel.login(UserModel("",mail.text.toString(),password.text.toString(),"",null,null))
+            loginViewModel.login(
+                UserModel(
+                    "",
+                    mail.text.toString(),
+                    password.text.toString(),
+                    "",
+                    null,
+                    null
+                )
+            ) {
+                goHomeFragment()
+            }
+        }
+
+        btnSignInFromInLogin.setOnClickListener {
+            goRegisterFragment()
         }
         return view
+    }
+
+    private fun goHomeFragment() {
+        val homeFragment = HomeFragment()
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragmentContainerView, homeFragment)
+        transaction.commit()
+    }
+
+    private fun goRegisterFragment() {
+        val registerFragment = RegisterFragment()
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragmentContainerView, registerFragment)
+        transaction.commit()
     }
 
 }
