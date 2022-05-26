@@ -1,19 +1,19 @@
 package com.tez.smartnotepad.ui.viewnote
 
 import android.app.Activity.RESULT_OK
-import android.app.AlertDialog
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import android.text.InputType
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.mlkit.vision.common.InputImage
@@ -32,9 +32,11 @@ import com.tez.smartnotepad.ui.dialog.GeneralDialogFragment
 import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.ViewNoteViewModel
+import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.*
 
 class ViewNoteFragment : Fragment() {
 
@@ -47,6 +49,7 @@ class ViewNoteFragment : Fragment() {
     private lateinit var contentAdapter: ContentAdapter
     private lateinit var contents: MutableList<ContentModel>
     private var textFromOcrOrVoice: String = ""
+    private lateinit var textToSpeechEngine: TextToSpeech
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +77,10 @@ class ViewNoteFragment : Fragment() {
                 startForOcrResult
             ) // higher order funcs. buraya taşısam ?
         contents = note.contentsContentDtos!!
+
+        textToSpeechEngine = TextToSpeech(activity){
+            textToSpeechEngine.language = Locale.ENGLISH
+        }
     }
 
     override fun onCreateView(
@@ -93,6 +100,7 @@ class ViewNoteFragment : Fragment() {
         val btnAddContentNormal = view.findViewById<Button>(R.id.btnAddContentText)
         val btnAddContentWithCamera = view.findViewById<Button>(R.id.btnAddContentCamera)
         val btnAddContentWithSpeech = view.findViewById<Button>(R.id.btnAddContentVoice)
+        val btnListen = view.findViewById<ImageButton>(R.id.btnListen)
 
         noteTitle.text = note.title
 
@@ -117,10 +125,15 @@ class ViewNoteFragment : Fragment() {
         }
 
 
+
         btnShareNote.setOnClickListener {
             showShareDialog(onPositive = { mail ->
                 shareNote(mail)
             })
+        }
+
+        btnListen.setOnClickListener{
+            speak(contents.toString())
         }
     }
 
@@ -215,6 +228,10 @@ class ViewNoteFragment : Fragment() {
         transaction.replace(R.id.fragmentContainerView, newContentFragment)
         transaction.addToBackStack(NewContentFragment::class.java.simpleName)
         transaction.commit()
+    }
+
+    private fun speak(text: String) = lifecycleScope.launch{
+        textToSpeechEngine.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
     }
 
     companion object {

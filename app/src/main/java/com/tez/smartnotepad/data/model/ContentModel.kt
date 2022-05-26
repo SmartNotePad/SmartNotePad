@@ -13,4 +13,8 @@ data class ContentModel(
     val createdDate: String,
     val modifiedDate: String,
     val type: Int
-)
+){
+    override fun toString(): String {
+        return this.context
+    }
+}

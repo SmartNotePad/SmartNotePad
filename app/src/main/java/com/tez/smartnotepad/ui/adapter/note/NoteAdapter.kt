@@ -56,7 +56,7 @@ class NoteAdapter(
             val tvTitle = noteItemView.findViewById<TextView>(R.id.tvNoteItemTitle)
             val tvDate = noteItemView.findViewById<TextView>(R.id.tvNoteItemCreatedDate)
             val tvContent = noteItemView.findViewById<TextView>(R.id.tvNoteItemContent)
-            val ibtnDelte = noteItemView.findViewById<ImageButton>(R.id.ibtnNoteItemDeleteNote)
+            val ibtnDelte = noteItemView.findViewById<ImageButton>(R.id.btnNoteItemDeleteNote)
 
             tvTitle.text = note.title
             tvDate.text = note.createdDate?.getParsedDate()

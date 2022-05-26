@@ -8,15 +8,43 @@
 
     <TextView
         android:id="@+id/tvNoteTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        tools:text="Note Title"
         android:textColor="@color/teal_700"
         android:textSize="20sp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/btnShareNote"
         app:layout_constraintEnd_toStartOf="@+id/btnShareNote"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btnShareNote" />
+        app:layout_constraintTop_toTopOf="@+id/btnShareNote"
+        tools:text="Note Title Note Title Note Title Note Title"
+        />
+
+    <Button
+        android:id="@+id/btnShareNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/share_note"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnListen"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tvNoteTitle"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btnListen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/btnShareNote"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnShareNote"
+        app:layout_constraintTop_toTopOf="@+id/btnShareNote"
+        app:srcCompat="@android:drawable/ic_media_play"
+        app:tint="@color/teal_700"
+        android:contentDescription="@string/listen_note" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvNoteContents"
@@ -27,17 +55,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnShareNote" />
-
-    <Button
-        android:id="@+id/btnShareNote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/share_note"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/tvNoteTitle"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btnAddContentCamera"
