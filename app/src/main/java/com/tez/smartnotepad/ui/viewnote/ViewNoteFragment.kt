@@ -1,6 +1,7 @@
 package com.tez.smartnotepad.ui.viewnote
 
 import android.app.Activity.RESULT_OK
+import android.media.Image
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
@@ -18,17 +19,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.mlkit.vision.common.InputImage
 import com.tez.smartnotepad.R
-import com.tez.smartnotepad.data.datasource.api.ApiClient
+import com.tez.smartnotepad.network.api.ApiClient
 import com.tez.smartnotepad.data.datasource.remote.ContentRemoteDataSource
-import com.tez.smartnotepad.data.model.ContentModel
-import com.tez.smartnotepad.data.model.NoteModel
-import com.tez.smartnotepad.data.model.ShareNoteModel
-import com.tez.smartnotepad.data.model.UserModel
+import com.tez.smartnotepad.data.model.*
 import com.tez.smartnotepad.data.repository.ContentRepository
 import com.tez.smartnotepad.network.service.ContentService
 import com.tez.smartnotepad.ui.adapter.content.ContentAdapter
+import com.tez.smartnotepad.ui.adapter.dialog.ParticipantDialogAdapter
 import com.tez.smartnotepad.ui.content.NewContentFragment
 import com.tez.smartnotepad.ui.dialog.GeneralDialogFragment
+import com.tez.smartnotepad.ui.dialog.ListDialogFragment
 import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.ViewNoteViewModel
@@ -96,11 +96,12 @@ class ViewNoteFragment : Fragment() {
 
         val noteTitle = view.findViewById<TextView>(R.id.tvNoteTitle)
         val rvContent = view.findViewById<RecyclerView>(R.id.rvNoteContents)
-        val btnShareNote = view.findViewById<Button>(R.id.btnShareNote)
+        val btnShareNote = view.findViewById<ImageButton>(R.id.btnShareNote)
         val btnAddContentNormal = view.findViewById<Button>(R.id.btnAddContentText)
         val btnAddContentWithCamera = view.findViewById<Button>(R.id.btnAddContentCamera)
         val btnAddContentWithSpeech = view.findViewById<Button>(R.id.btnAddContentVoice)
         val btnListen = view.findViewById<ImageButton>(R.id.btnListen)
+        val btnRemoveParticipant = view.findViewById<ImageButton>(R.id.btnRemoveParticipant)
 
         noteTitle.text = note.title
 
@@ -135,7 +136,13 @@ class ViewNoteFragment : Fragment() {
         btnListen.setOnClickListener{
             speak(contents.toString())
         }
+
+        btnRemoveParticipant.setOnClickListener {
+            showRemoveParticipantDialog()
+        }
     }
+
+
 
     private fun initAdapter(): ContentAdapter {
         return ContentAdapter(
@@ -189,6 +196,19 @@ class ViewNoteFragment : Fragment() {
     private fun showShareDialog(onPositive: (value: String) -> Unit) {
         val dialogFragment = GeneralDialogFragment(null) { onPositive.invoke(it) }
         dialogFragment.show(childFragmentManager, "Share")
+    }
+
+    private fun showRemoveParticipantDialog() {
+
+        val participant = ParticipantModel(note.userUserId.toString(),"",note.noteId.toString())
+
+        val dialogFragment = note.participantUsersUserId?.let { participantUsers ->
+            ListDialogFragment(participantUsers) {
+                viewNoteViewModel.removeParticipantUser(participant.copy(participantUsersUserId = it.userId))
+            }
+        }
+
+        dialogFragment?.show(childFragmentManager,"RemoveParticipant")
     }
 
     private val startForSpeechResult = registerForActivityResult(

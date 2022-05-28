@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.material.textfield.TextInputEditText
 import com.tez.smartnotepad.R
-import com.tez.smartnotepad.data.datasource.api.ApiClient
+import com.tez.smartnotepad.network.api.ApiClient
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.data.datasource.remote.AuthRemoteDataSource
 import com.tez.smartnotepad.data.model.UserModel

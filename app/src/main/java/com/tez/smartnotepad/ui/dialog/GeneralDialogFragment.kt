@@ -1,8 +1,6 @@
 package com.tez.smartnotepad.ui.dialog
 
 import android.app.Dialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
@@ -18,7 +16,7 @@ class GeneralDialogFragment(
 
         return activity?.let { it ->
 
-            val view = it.layoutInflater.inflate(R.layout.dialog_general_edit, null)
+            val view = it.layoutInflater.inflate(R.layout.dialog_general, null)
             val result = view.findViewById<EditText>(R.id.etEditContent)
 
             oldValue?.let { v ->
@@ -34,8 +32,9 @@ class GeneralDialogFragment(
                     dialog?.cancel()
                 }.create()
 
-            dialog.window?.setBackgroundDrawableResource(R.color.white_600);
+            dialog.window?.setBackgroundDrawableResource(R.color.white_600)
             return dialog
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 }
+

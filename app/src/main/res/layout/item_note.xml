@@ -67,27 +67,5 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/tvNoteItemCreatedDate"
             app:layout_constraintTop_toTopOf="@+id/tvNoteItemCreatedDate" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 </com.google.android.material.card.MaterialCardView>
-
-<!--
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-
-
-
-    </LinearLayout>
-
-
-
-
-
--->

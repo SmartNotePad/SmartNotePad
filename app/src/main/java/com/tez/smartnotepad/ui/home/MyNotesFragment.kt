@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.mlkit.vision.common.InputImage
 import com.tez.smartnotepad.R
-import com.tez.smartnotepad.data.datasource.api.ApiClient
+import com.tez.smartnotepad.network.api.ApiClient
 import com.tez.smartnotepad.data.datasource.remote.NoteRemoteDataSource
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel

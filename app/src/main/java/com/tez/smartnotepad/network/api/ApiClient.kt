@@ -1,4 +1,4 @@
-package com.tez.smartnotepad.data.datasource.api
+package com.tez.smartnotepad.network.api
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

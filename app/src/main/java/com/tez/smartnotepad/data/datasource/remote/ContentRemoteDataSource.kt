@@ -1,9 +1,7 @@
 package com.tez.smartnotepad.data.datasource.remote
 
 import com.tez.smartnotepad.data.ResultWrapper
-import com.tez.smartnotepad.data.model.ContentModel
-import com.tez.smartnotepad.data.model.NoteModel
-import com.tez.smartnotepad.data.model.ShareNoteModel
+import com.tez.smartnotepad.data.model.*
 import com.tez.smartnotepad.network.service.ContentService
 
 class ContentRemoteDataSource(private val contentService: ContentService) : BaseRemoteDataSource() {
@@ -28,4 +26,8 @@ class ContentRemoteDataSource(private val contentService: ContentService) : Base
 
     suspend fun deleteNote(note: NoteModel) =
         apiCall { contentService.deleteNote(note) }
+
+    suspend fun removeParticipant(participantModel: ParticipantModel) =
+        apiCall { contentService.removeParticipant(participantModel) }
+
 }

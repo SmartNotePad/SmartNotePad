@@ -6,9 +6,7 @@ import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tez.smartnotepad.data.model.ContentModel
-import com.tez.smartnotepad.data.model.NoteModel
-import com.tez.smartnotepad.data.model.ShareNoteModel
+import com.tez.smartnotepad.data.model.*
 import com.tez.smartnotepad.data.repository.ContentRepository
 import com.tez.smartnotepad.network.helper.Request.makeNetworkRequest
 import kotlinx.coroutines.launch
@@ -96,6 +94,11 @@ class ViewNoteViewModel(private val contentRepository: ContentRepository, privat
         },{},{},viewModelScope)
     }
 
+    fun removeParticipantUser(participantModel: ParticipantModel) {
+        makeNetworkRequest({
+            contentRepository.removeParticipant(participantModel)
+        },{},{},viewModelScope)
+    }
 
     fun displaySpeechRecognizer() {
         startForSpeechResult.launch(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
@@ -117,5 +120,7 @@ class ViewNoteViewModel(private val contentRepository: ContentRepository, privat
         chooseIntent.action = Intent.ACTION_GET_CONTENT
         startForOcrResult.launch(chooseIntent)
     }
+
+
 
 }

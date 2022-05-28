@@ -21,12 +21,14 @@
         tools:text="Note Title Note Title Note Title Note Title"
         />
 
-    <Button
+    <ImageButton
         android:id="@+id/btnShareNote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/share_note"
+        android:contentDescription="@string/share_note"
+        app:srcCompat="@android:drawable/ic_menu_share"
+        app:tint="@color/teal_700"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btnListen"
         app:layout_constraintHorizontal_bias="0.5"
@@ -37,14 +39,27 @@
         android:id="@+id/btnListen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/btnShareNote"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnShareNote"
-        app:layout_constraintTop_toTopOf="@+id/btnShareNote"
+        android:contentDescription="@string/listen_note"
         app:srcCompat="@android:drawable/ic_media_play"
         app:tint="@color/teal_700"
-        android:contentDescription="@string/listen_note" />
+        app:layout_constraintBottom_toBottomOf="@+id/btnShareNote"
+        app:layout_constraintEnd_toEndOf="@+id/btnRemoveParticipant"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnShareNote"
+        app:layout_constraintTop_toTopOf="@+id/btnShareNote"/>
+
+    <ImageButton
+        android:id="@+id/btnRemoveParticipant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/listen_note"
+        app:srcCompat="@android:drawable/ic_menu_myplaces"
+        app:tint="@color/teal_700"
+        app:layout_constraintBottom_toBottomOf="@+id/btnListen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnListen"
+        app:layout_constraintTop_toTopOf="@+id/btnListen"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvNoteContents"

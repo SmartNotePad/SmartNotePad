@@ -1,9 +1,6 @@
 package com.tez.smartnotepad.network.service
 
-import com.tez.smartnotepad.data.model.BaseResponseModel
-import com.tez.smartnotepad.data.model.ContentModel
-import com.tez.smartnotepad.data.model.NoteModel
-import com.tez.smartnotepad.data.model.ShareNoteModel
+import com.tez.smartnotepad.data.model.*
 import retrofit2.http.*
 
 interface ContentService {
@@ -37,4 +34,10 @@ interface ContentService {
     suspend fun deleteNote(
         @Body note: NoteModel
     ): BaseResponseModel<Any?>
+
+    @HTTP(method = "DELETE", path = "notes/delete-partipitiantuser-from-note", hasBody = true)
+    suspend fun removeParticipant(
+        @Body participantModel: ParticipantModel
+    ): BaseResponseModel<Any?>
+
 }

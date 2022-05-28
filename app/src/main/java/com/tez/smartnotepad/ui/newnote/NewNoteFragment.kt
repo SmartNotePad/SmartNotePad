@@ -9,7 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.tez.smartnotepad.R
-import com.tez.smartnotepad.data.datasource.api.ApiClient
+import com.tez.smartnotepad.network.api.ApiClient
 import com.tez.smartnotepad.data.datasource.remote.ContentRemoteDataSource
 import com.tez.smartnotepad.data.datasource.remote.NoteRemoteDataSource
 import com.tez.smartnotepad.data.model.NoteModel

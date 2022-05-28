@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import com.tez.smartnotepad.R
-import com.tez.smartnotepad.data.datasource.api.ApiClient
+import com.tez.smartnotepad.network.api.ApiClient
 import com.tez.smartnotepad.data.datasource.remote.ContentRemoteDataSource
 import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.model.NoteModel
