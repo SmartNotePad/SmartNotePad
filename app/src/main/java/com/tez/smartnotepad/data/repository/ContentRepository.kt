@@ -1,39 +1,24 @@
 package com.tez.smartnotepad.data.repository
 
 import com.tez.smartnotepad.data.ResultWrapper
-import com.tez.smartnotepad.data.datasource.remote.ContentRemoteDataSource
-import com.tez.smartnotepad.data.model.*
+import com.tez.smartnotepad.data.model.ContentModel
+import com.tez.smartnotepad.data.model.NoteModel
+import com.tez.smartnotepad.data.model.ParticipantModel
+import com.tez.smartnotepad.data.model.ShareNoteModel
 
-// user ve note alıp, parametrelerde gerekli alanları burda doldurmak mı mantıklı yoksa viewModel üstünden mi idleri direk göndermeli?
-class ContentRepository(
-    private val user: UserModel,
-    private val contentRemoteDataSource: ContentRemoteDataSource
-) {
+interface ContentRepository {
 
-    suspend fun createContent(
-        content: ContentModel
-    ): ResultWrapper<ContentModel> =
-        contentRemoteDataSource.createContent(content)
+    suspend fun createContent(content: ContentModel): ResultWrapper<ContentModel>
 
-    suspend fun deleteContent(contentId: Int)
-            : ResultWrapper<Any?> =
-        contentRemoteDataSource.deleteContent(contentId)
+    suspend fun deleteContent(contentId: Int): ResultWrapper<Any?>
 
-    suspend fun updateContent(content: ContentModel)
-            : ResultWrapper<ContentModel> =
-        contentRemoteDataSource.updateContent(content)
+    suspend fun updateContent(content: ContentModel): ResultWrapper<ContentModel>
 
-    suspend fun getContentsOfNote(noteId: Int)
-            : ResultWrapper<MutableList<ContentModel>> =
-        contentRemoteDataSource.getContentsOfNote(noteId)
+    suspend fun getContentsOfNote(noteId: Int): ResultWrapper<MutableList<ContentModel>>
 
-    suspend fun shareNote(sharedNoteModel: ShareNoteModel)
-            : ResultWrapper<NoteModel> =
-        contentRemoteDataSource.shareNote(sharedNoteModel)
+    suspend fun shareNote(sharedNoteModel: ShareNoteModel): ResultWrapper<NoteModel>
 
-    suspend fun deleteNote(note: NoteModel)
-        = contentRemoteDataSource.deleteNote(note)
+    suspend fun deleteNote(note: NoteModel): ResultWrapper<Any>
 
-    suspend fun removeParticipant(participantModel: ParticipantModel)
-        = contentRemoteDataSource.removeParticipant(participantModel)
+    suspend fun removeParticipant(participantModel: ParticipantModel) : ResultWrapper<Any>
 }

@@ -9,16 +9,15 @@ import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.ui.home.HomeFragment
 import com.tez.smartnotepad.ui.login.LoginFragment
 import com.tez.smartnotepad.util.ext.name
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var prefDataSource: PrefDataSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        prefDataSource = PrefDataSource(this.getSharedPreferences("SMART", Context.MODE_PRIVATE))
 
         val isLogged = intent.getBooleanExtra("Logged",false)
         if (isLogged) goNotesFragment() else goLoginFragment()

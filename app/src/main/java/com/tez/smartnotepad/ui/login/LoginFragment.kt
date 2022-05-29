@@ -1,50 +1,36 @@
 package com.tez.smartnotepad.ui.login
 
-import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.google.android.material.textfield.TextInputEditText
 import com.tez.smartnotepad.R
-import com.tez.smartnotepad.network.api.ApiClient
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
-import com.tez.smartnotepad.data.datasource.remote.AuthRemoteDataSource
 import com.tez.smartnotepad.data.model.UserModel
-import com.tez.smartnotepad.data.repository.AuthRepository
-import com.tez.smartnotepad.network.service.UserService
 import com.tez.smartnotepad.ui.home.HomeFragment
 import com.tez.smartnotepad.ui.register.RegisterFragment
+import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.vm.LoginViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
 
-    private lateinit var loginViewModel: LoginViewModel
-    private lateinit var authRepository: AuthRepository
-    private lateinit var prefDataSource: PrefDataSource
-    private lateinit var authRemoteDataSource: AuthRemoteDataSource
-    private lateinit var userService: UserService
-    private lateinit var apiClient: ApiClient
+    @Inject
+    lateinit var preferences: PrefDataSource
+    val loginViewModel: LoginViewModel by viewModels()
+
+    private lateinit var user: UserModel
     private lateinit var mail: TextInputEditText
     private lateinit var password: TextInputEditText
     private lateinit var btnSignInFromInLogin: Button
     private lateinit var btnLogin: Button
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        prefDataSource =
-            PrefDataSource(requireContext().getSharedPreferences("SMART", Context.MODE_PRIVATE))
-
-        apiClient = ApiClient
-        userService = apiClient.getClient().create(UserService::class.java)
-        authRemoteDataSource = AuthRemoteDataSource(userService)
-
-        authRepository = AuthRepository(prefDataSource, authRemoteDataSource)
-        loginViewModel = LoginViewModel(authRepository)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,16 +44,13 @@ class LoginFragment : Fragment() {
         btnLogin = view.findViewById(R.id.loginButton)
 
         btnLogin.setOnClickListener {
+            user = getUserFromInputs()
+
             loginViewModel.login(
-                UserModel(
-                    "",
-                    mail.text.toString(),
-                    password.text.toString(),
-                    "",
-                    null,
-                    null
-                )
+                user
             ) {
+                Log.e(name(),user.toString())
+                preferences.user = user
                 goHomeFragment()
             }
         }
@@ -77,6 +60,16 @@ class LoginFragment : Fragment() {
         }
         return view
     }
+
+    private fun getUserFromInputs(): UserModel =
+        UserModel(
+            "",
+            mail.text.toString(),
+            password.text.toString(),
+            "",
+            null,
+            null
+        )
 
     private fun goHomeFragment() {
         val homeFragment = HomeFragment()

@@ -1,7 +1,7 @@
 package com.tez.smartnotepad.ui.viewnote
 
 import android.app.Activity.RESULT_OK
-import android.media.Image
+import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
@@ -14,42 +14,45 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.mlkit.vision.common.InputImage
 import com.tez.smartnotepad.R
-import com.tez.smartnotepad.network.api.ApiClient
-import com.tez.smartnotepad.data.datasource.remote.ContentRemoteDataSource
-import com.tez.smartnotepad.data.model.*
-import com.tez.smartnotepad.data.repository.ContentRepository
-import com.tez.smartnotepad.network.service.ContentService
+import com.tez.smartnotepad.data.model.ContentModel
+import com.tez.smartnotepad.data.model.NoteModel
+import com.tez.smartnotepad.data.model.ParticipantModel
+import com.tez.smartnotepad.data.model.ShareNoteModel
 import com.tez.smartnotepad.ui.adapter.content.ContentAdapter
-import com.tez.smartnotepad.ui.adapter.dialog.ParticipantDialogAdapter
 import com.tez.smartnotepad.ui.content.NewContentFragment
 import com.tez.smartnotepad.ui.dialog.GeneralDialogFragment
 import com.tez.smartnotepad.ui.dialog.ListDialogFragment
 import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.ViewNoteViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.*
 
+@AndroidEntryPoint
 class ViewNoteFragment : Fragment() {
 
     private lateinit var note: NoteModel
-    private lateinit var viewNoteViewModel: ViewNoteViewModel
-    private lateinit var contentRepository: ContentRepository
-    private lateinit var contentRemoteDataSource: ContentRemoteDataSource
-    private lateinit var contentService: ContentService
-    private lateinit var apiClient: ApiClient
+    val viewNoteViewModel: ViewNoteViewModel by viewModels()
+
     private lateinit var contentAdapter: ContentAdapter
     private lateinit var contents: MutableList<ContentModel>
     private var textFromOcrOrVoice: String = ""
-    private lateinit var textToSpeechEngine: TextToSpeech
+
+    private val textToSpeechEngine: TextToSpeech by lazy {
+        TextToSpeech(activity) {
+            textToSpeechEngine.language = Locale.ENGLISH
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,30 +60,7 @@ class ViewNoteFragment : Fragment() {
             note = Json.decodeFromString(it.getString("selectedNote").toString())
         }
 
-        val user =
-            UserModel(
-                userId = "2",
-                mail = "string1",
-                password = "string",
-                nameSurname = "string",
-                null,
-                null
-            )
-        apiClient = ApiClient
-        contentService = apiClient.getClient().create(ContentService::class.java)
-        contentRemoteDataSource = ContentRemoteDataSource(contentService)
-        contentRepository = ContentRepository(user, contentRemoteDataSource)
-        viewNoteViewModel =
-            ViewNoteViewModel(
-                contentRepository,
-                startForSpeechResult,
-                startForOcrResult
-            ) // higher order funcs. buraya taşısam ?
         contents = note.contentsContentDtos!!
-
-        textToSpeechEngine = TextToSpeech(activity){
-            textToSpeechEngine.language = Locale.ENGLISH
-        }
     }
 
     override fun onCreateView(
@@ -118,13 +98,12 @@ class ViewNoteFragment : Fragment() {
         }
 
         btnAddContentWithSpeech.setOnClickListener {
-            viewNoteViewModel.displaySpeechRecognizer()
+            displaySpeechRecognizer()
         }
 
         btnAddContentWithCamera.setOnClickListener {
-            viewNoteViewModel.displayOcr()
+            displayOcr()
         }
-
 
 
         btnShareNote.setOnClickListener {
@@ -133,7 +112,7 @@ class ViewNoteFragment : Fragment() {
             })
         }
 
-        btnListen.setOnClickListener{
+        btnListen.setOnClickListener {
             speak(contents.toString())
         }
 
@@ -141,7 +120,6 @@ class ViewNoteFragment : Fragment() {
             showRemoveParticipantDialog()
         }
     }
-
 
 
     private fun initAdapter(): ContentAdapter {
@@ -179,7 +157,7 @@ class ViewNoteFragment : Fragment() {
         })
     }
 
-    private fun shareNote(mail:String){
+    private fun shareNote(mail: String) {
         viewNoteViewModel.shareNote(ShareNoteModel(note.userUserId, note.noteId, mail),
             {
                 Log.e(name(), it.toString())
@@ -200,7 +178,7 @@ class ViewNoteFragment : Fragment() {
 
     private fun showRemoveParticipantDialog() {
 
-        val participant = ParticipantModel(note.userUserId.toString(),"",note.noteId.toString())
+        val participant = ParticipantModel(note.userUserId.toString(), "", note.noteId.toString())
 
         val dialogFragment = note.participantUsersUserId?.let { participantUsers ->
             ListDialogFragment(participantUsers) {
@@ -208,7 +186,28 @@ class ViewNoteFragment : Fragment() {
             }
         }
 
-        dialogFragment?.show(childFragmentManager,"RemoveParticipant")
+        dialogFragment?.show(childFragmentManager, "RemoveParticipant")
+    }
+
+    fun displaySpeechRecognizer() {
+        startForSpeechResult.launch(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("en_US"))
+            putExtra(
+                RecognizerIntent.EXTRA_PROMPT,
+                Locale("Hi from the inside of the android on windows. Sanki inception.")
+            )
+        })
+    }
+
+    fun displayOcr() {
+        val chooseIntent = Intent()
+        chooseIntent.type = "image/*"
+        chooseIntent.action = Intent.ACTION_GET_CONTENT
+        startForOcrResult.launch(chooseIntent)
     }
 
     private val startForSpeechResult = registerForActivityResult(
@@ -250,7 +249,7 @@ class ViewNoteFragment : Fragment() {
         transaction.commit()
     }
 
-    private fun speak(text: String) = lifecycleScope.launch{
+    private fun speak(text: String) = lifecycleScope.launch {
         textToSpeechEngine.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
     }
 

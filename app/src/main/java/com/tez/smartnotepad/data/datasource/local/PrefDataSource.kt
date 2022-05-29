@@ -4,9 +4,10 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.google.gson.Gson
 import com.tez.smartnotepad.data.model.UserModel
+import javax.inject.Inject
 
 
-class PrefDataSource(private val sharedPref: SharedPreferences) {
+class PrefDataSource @Inject constructor(val sharedPref: SharedPreferences) {
 
     private var gson: Gson = Gson()
 

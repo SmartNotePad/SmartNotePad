@@ -12,8 +12,14 @@ import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.ContentRepository
 import com.tez.smartnotepad.data.repository.NoteRepository
 import com.tez.smartnotepad.network.helper.Request.makeNetworkRequest
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class NewNoteViewModel(private val noteRepository: NoteRepository, private val contentRepository: ContentRepository) : ViewModel() {
+@HiltViewModel
+class NewNoteViewModel @Inject constructor(
+    private val noteRepositoryImpl: NoteRepository,
+    private val contentRepositoryImpl: ContentRepository
+) : ViewModel() {
 
     private var _note = MutableLiveData<NoteModel>()
     val note: LiveData<NoteModel>
@@ -22,7 +28,7 @@ class NewNoteViewModel(private val noteRepository: NoteRepository, private val c
     fun createEmptyNote(user: UserModel) {
         makeNetworkRequest(
             requestFunc = {
-                noteRepository.createEmptyNote(user)
+                noteRepositoryImpl.createEmptyNote(user)
             },
             onSuccess = {
                 Log.e(NewNoteViewModel::class.java.simpleName + " - createEmptyNote", it.toString())
@@ -35,10 +41,10 @@ class NewNoteViewModel(private val noteRepository: NoteRepository, private val c
         )
     }
 
-    private fun updateNoteTitle(etTitle: EditText){
+    private fun updateNoteTitle(etTitle: EditText) {
         makeNetworkRequest(
             requestFunc = {
-                noteRepository.updateNoteTitle(_note.value!!.copy(title = etTitle.text.toString()))
+                noteRepositoryImpl.updateNoteTitle(_note.value!!.copy(title = etTitle.text.toString()))
             },
             onSuccess = {
                 Log.e(NewNoteViewModel::class.java.simpleName + " - updateNoteTitle", it.toString())
@@ -51,7 +57,15 @@ class NewNoteViewModel(private val noteRepository: NoteRepository, private val c
         )
     }
 
-    fun createContentAndUpdateTitle(etTitle: EditText,etContent: EditText, type: Int,ownerUserId: String) {
+    fun createContentAndUpdateTitle(
+        etTitle: EditText,
+        etContent: EditText,
+        type: Int,
+        ownerUserId: String
+    ) {
+
+        // fix çözüm. sonra detay giricem.
+        //val noteId = if(note.value?.noteId != null) {note.value!!.noteId} else {1}
 
         val content = ContentModel(
             0,
@@ -67,7 +81,7 @@ class NewNoteViewModel(private val noteRepository: NoteRepository, private val c
 
         makeNetworkRequest(
             requestFunc = {
-                contentRepository.createContent(content)
+                contentRepositoryImpl.createContent(content)
             },
             onSuccess = {
                 Log.e(NewNoteViewModel::class.java.simpleName + " - createContent ", it.toString())

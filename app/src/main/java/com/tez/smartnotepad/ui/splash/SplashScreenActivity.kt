@@ -9,16 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.ui.main.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SplashScreenActivity : AppCompatActivity() {
 
-    private lateinit var prefDataSource: PrefDataSource
+    @Inject lateinit var prefDataSource: PrefDataSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
-
-        prefDataSource = PrefDataSource(this.getSharedPreferences("SMART", Context.MODE_PRIVATE))
 
         Handler().postDelayed({
             val intent= Intent(this, MainActivity::class.java)

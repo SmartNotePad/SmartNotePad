@@ -3,8 +3,10 @@ package com.tez.smartnotepad.data.datasource.remote
 import com.tez.smartnotepad.data.ResultWrapper
 import com.tez.smartnotepad.data.model.*
 import com.tez.smartnotepad.network.service.ContentService
+import javax.inject.Inject
 
-class ContentRemoteDataSource(private val contentService: ContentService) : BaseRemoteDataSource() {
+
+class ContentRemoteDataSource @Inject constructor(private val contentService: ContentService) : BaseRemoteDataSource() {
 
     suspend fun createContent(content: ContentModel)
             : ResultWrapper<ContentModel> =

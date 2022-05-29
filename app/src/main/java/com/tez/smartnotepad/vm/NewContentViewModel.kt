@@ -5,9 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.repository.ContentRepository
+import com.tez.smartnotepad.data.repository.ContentRepositoryImpl
 import com.tez.smartnotepad.network.helper.Request
+import com.tez.smartnotepad.network.helper.Request.makeNetworkRequest
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class NewContentViewModel(private val contentRepository: ContentRepository) : ViewModel() {
+@HiltViewModel
+class NewContentViewModel @Inject constructor(val contentRepositoryImpl: ContentRepository) : ViewModel() {
 
     fun addContent(
         ownerUserId: String,
@@ -30,9 +35,9 @@ class NewContentViewModel(private val contentRepository: ContentRepository) : Vi
             type
         )
 
-        Request.makeNetworkRequest(
+        makeNetworkRequest(
             requestFunc = {
-                contentRepository.createContent(content)
+                contentRepositoryImpl.createContent(content)
             }, onSuccess = {
                 onSuccess.invoke()
             }, onError = {

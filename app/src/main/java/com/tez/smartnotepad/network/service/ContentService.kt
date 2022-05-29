@@ -33,11 +33,11 @@ interface ContentService {
     @HTTP(method = "DELETE", path = "notes/delete", hasBody = true)
     suspend fun deleteNote(
         @Body note: NoteModel
-    ): BaseResponseModel<Any?>
+    ): BaseResponseModel<Any>
 
     @HTTP(method = "DELETE", path = "notes/delete-partipitiantuser-from-note", hasBody = true)
     suspend fun removeParticipant(
         @Body participantModel: ParticipantModel
-    ): BaseResponseModel<Any?>
+    ): BaseResponseModel<Any>
 
 }

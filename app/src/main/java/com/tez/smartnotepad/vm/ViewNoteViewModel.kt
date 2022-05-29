@@ -1,20 +1,21 @@
 package com.tez.smartnotepad.vm
 
-import android.content.Intent
-import android.speech.RecognizerIntent
 import android.util.Log
-import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tez.smartnotepad.data.model.*
+import com.tez.smartnotepad.data.model.ContentModel
+import com.tez.smartnotepad.data.model.NoteModel
+import com.tez.smartnotepad.data.model.ParticipantModel
+import com.tez.smartnotepad.data.model.ShareNoteModel
 import com.tez.smartnotepad.data.repository.ContentRepository
 import com.tez.smartnotepad.network.helper.Request.makeNetworkRequest
-import kotlinx.coroutines.launch
-import java.util.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class ViewNoteViewModel(private val contentRepository: ContentRepository, private val startForSpeechResult: ActivityResultLauncher<Intent>, private val startForOcrResult: ActivityResultLauncher<Intent>) : ViewModel() {
-
-
+@HiltViewModel
+class ViewNoteViewModel @Inject constructor(
+    private val contentRepositoryImpl: ContentRepository
+) : ViewModel() {
 
     fun deleteContent(
         content: ContentModel,
@@ -24,7 +25,7 @@ class ViewNoteViewModel(private val contentRepository: ContentRepository, privat
         makeNetworkRequest(
             requestFunc = {
                 Log.e("ViewNoteViewModel", content.contentId.toString())
-                contentRepository.deleteContent(content.contentId)
+                contentRepositoryImpl.deleteContent(content.contentId)
             }, onSuccess = {
                 onSuccess.invoke()
             }, onError = {
@@ -40,7 +41,7 @@ class ViewNoteViewModel(private val contentRepository: ContentRepository, privat
     ) {
         makeNetworkRequest(
             requestFunc = {
-                contentRepository.updateContent(content)
+                contentRepositoryImpl.updateContent(content)
             }, onSuccess = {
                 onSuccess.invoke(it)
             }, onError = {
@@ -56,7 +57,7 @@ class ViewNoteViewModel(private val contentRepository: ContentRepository, privat
     ) {
         makeNetworkRequest(
             requestFunc = {
-                contentRepository.getContentsOfNote(noteId)
+                contentRepositoryImpl.getContentsOfNote(noteId)
             },
             onSuccess = {
                 onSuccess.invoke(it)
@@ -72,11 +73,10 @@ class ViewNoteViewModel(private val contentRepository: ContentRepository, privat
         sharedNoteModel: ShareNoteModel,
         onSuccess: (sharedNote: NoteModel) -> Unit,
         onError: (error: String) -> Unit
-    )
-    {
+    ) {
         makeNetworkRequest(
             requestFunc = {
-                contentRepository.shareNote(sharedNoteModel)
+                contentRepositoryImpl.shareNote(sharedNoteModel)
             },
             onSuccess = {
                 onSuccess.invoke(it)
@@ -88,39 +88,15 @@ class ViewNoteViewModel(private val contentRepository: ContentRepository, privat
         )
     }
 
-    fun deleteNote(note: NoteModel){
+    fun deleteNote(note: NoteModel) {
         makeNetworkRequest({
-            contentRepository.deleteNote(note)
-        },{},{},viewModelScope)
+            contentRepositoryImpl.deleteNote(note)
+        }, {}, {}, viewModelScope)
     }
 
     fun removeParticipantUser(participantModel: ParticipantModel) {
         makeNetworkRequest({
-            contentRepository.removeParticipant(participantModel)
-        },{},{},viewModelScope)
+            contentRepositoryImpl.removeParticipant(participantModel)
+        }, {}, {}, viewModelScope)
     }
-
-    fun displaySpeechRecognizer() {
-        startForSpeechResult.launch(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-            )
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("en_US"))
-            putExtra(
-                RecognizerIntent.EXTRA_PROMPT,
-                Locale("Hi from the inside of the android on windows. Sanki inception.")
-            )
-        })
-    }
-
-    fun displayOcr() {
-        val chooseIntent = Intent()
-        chooseIntent.type = "image/*"
-        chooseIntent.action = Intent.ACTION_GET_CONTENT
-        startForOcrResult.launch(chooseIntent)
-    }
-
-
-
 }

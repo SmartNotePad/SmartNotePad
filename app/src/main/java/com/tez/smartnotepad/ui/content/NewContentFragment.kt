@@ -9,32 +9,29 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.fragment.app.viewModels
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.network.api.ApiClient
 import com.tez.smartnotepad.data.datasource.remote.ContentRemoteDataSource
-import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
-import com.tez.smartnotepad.data.repository.ContentRepository
+import com.tez.smartnotepad.data.repository.ContentRepositoryImpl
 import com.tez.smartnotepad.network.service.ContentService
-import com.tez.smartnotepad.ui.newnote.NewNoteFragment
-import com.tez.smartnotepad.ui.viewnote.ViewNoteFragment
 import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.vm.NewContentViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+@AndroidEntryPoint
 class NewContentFragment : Fragment() {
 
     private lateinit var user: UserModel
     private lateinit var note: NoteModel
 
-    private lateinit var newContentViewModel: NewContentViewModel
-    private lateinit var contentRepository: ContentRepository
-    private lateinit var contentRemoteDataSource: ContentRemoteDataSource
-    private lateinit var contentService: ContentService
-    private lateinit var apiClient: ApiClient
+    val newContentViewModel: NewContentViewModel by viewModels()
+
     private lateinit var textFromOcrOrVoice: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,11 +52,6 @@ class NewContentFragment : Fragment() {
                 null
             )
 
-        apiClient = ApiClient
-        contentService = apiClient.getClient().create(ContentService::class.java)
-        contentRemoteDataSource = ContentRemoteDataSource(contentService)
-        contentRepository = ContentRepository(user, contentRemoteDataSource)
-        newContentViewModel = NewContentViewModel(contentRepository)
     }
 
     override fun onCreateView(

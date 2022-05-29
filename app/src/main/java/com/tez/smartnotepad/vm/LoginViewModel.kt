@@ -1,42 +1,26 @@
 package com.tez.smartnotepad.vm
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tez.smartnotepad.data.ResultWrapper
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.AuthRepository
-import kotlinx.coroutines.launch
+import com.tez.smartnotepad.network.helper.Request.makeNetworkRequest
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class LoginViewModel(private val authRepository: AuthRepository): ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(val authRepositoryImpl: AuthRepository) : ViewModel() {
 
     private lateinit var _user: UserModel
     val user: UserModel
-        get()  = _user
+        get() = _user
 
-    fun login(userModel: UserModel, onSucces: () -> Unit) {
+    fun login(userModel: UserModel, onSuccess: () -> Unit) {
         makeNetworkRequest(
-            requestFunc = { authRepository.login(userModel) },{
-                onSucces.invoke()
-            }
+            requestFunc = { authRepositoryImpl.login(userModel) },
+            onSuccess = {
+                onSuccess.invoke()
+            }, {}, viewModelScope
         )
-    }
-    private fun <T> makeNetworkRequest(
-        requestFunc: suspend () -> ResultWrapper<T>,
-        onSucces: () -> Unit
-    ) {
-        viewModelScope.launch {
-            when (val response = requestFunc.invoke()) {
-                is ResultWrapper.Success -> {
-                    authRepository.saveUserToPref((response.value as UserModel))
-                    onSucces.invoke()
-                }
-                is ResultWrapper.Error -> {
-                    // TODO error handle
-                    Log.e(LoginViewModel::class.java.simpleName,"Giriş Hata !!")
-                    Log.e(LoginViewModel::class.java.simpleName,response.value)
-                }
-            }
-        }
     }
 }

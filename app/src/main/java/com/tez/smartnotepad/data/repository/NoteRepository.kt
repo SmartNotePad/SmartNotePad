@@ -1,28 +1,20 @@
 package com.tez.smartnotepad.data.repository
 
 import com.tez.smartnotepad.data.ResultWrapper
-import com.tez.smartnotepad.data.datasource.remote.NoteRemoteDataSource
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
 
-class NoteRepository(private val user: UserModel, private val noteRemoteDataSource: NoteRemoteDataSource) {
+// Interface vs Abstract Impl. ? diff?
 
-    suspend fun getMyNotes(): ResultWrapper<MutableList<NoteModel>>{
-        return noteRemoteDataSource.getMyNotes(user)
-    }
+interface NoteRepository {
 
-    suspend fun getSharedNotesWithMe(): ResultWrapper<MutableList<NoteModel>>{
-        return noteRemoteDataSource.getSharedNotesWithMe(user)
-    }
+    suspend fun getMyNotes(user: UserModel): ResultWrapper<MutableList<NoteModel>>
 
-    suspend fun createEmptyNote(user: UserModel): ResultWrapper<NoteModel> {
-        return noteRemoteDataSource.createEmptyNote(user)
-    }
+    suspend fun getSharedNotesWithMe(user: UserModel): ResultWrapper<MutableList<NoteModel>>
 
-    suspend fun updateNoteTitle(note: NoteModel): ResultWrapper<NoteModel> {
-        return noteRemoteDataSource.updateNoteTitle(note)
-    }
+    suspend fun createEmptyNote(user: UserModel): ResultWrapper<NoteModel>
 
-    suspend fun deleteNote(note: NoteModel)
-            = noteRemoteDataSource.deleteNote(note)
+    suspend fun updateNoteTitle(note: NoteModel): ResultWrapper<NoteModel>
+
+    suspend fun deleteNote(note: NoteModel): ResultWrapper<Any?>
 }

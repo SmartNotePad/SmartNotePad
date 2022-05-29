@@ -12,11 +12,12 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.ui.profile.ProfileFragment
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-    private lateinit var demoCollectionAdapter: DemoCollectionAdapter
+    private lateinit var viewPagerAdapter: viewPagerAdapter
     private lateinit var viewPager: ViewPager2
 
     override fun onCreateView(
@@ -24,19 +25,15 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_home_base, container, false)
-
-
-
-        return view
+        return  inflater.inflate(R.layout.fragment_home_base, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        demoCollectionAdapter = DemoCollectionAdapter(this)
+        viewPagerAdapter = viewPagerAdapter(this)
         viewPager = view.findViewById(R.id.viewPager)
-        viewPager.adapter = demoCollectionAdapter
+        viewPager.adapter = viewPagerAdapter
 
         val tabLayout: TabLayout = view.findViewById(R.id.tab_layout)
 
@@ -62,7 +59,6 @@ class HomeFragment : Fragment() {
         materialToolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menuProfile -> {
-                    Toast.makeText(requireContext(), "Dıklandım", Toast.LENGTH_SHORT).show()
                     goProfileFragment()
                     true
                 }
@@ -84,7 +80,7 @@ class HomeFragment : Fragment() {
     }
 }
 
-class DemoCollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class viewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = 2
 
