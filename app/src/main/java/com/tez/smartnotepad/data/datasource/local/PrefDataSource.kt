@@ -26,8 +26,6 @@ class PrefDataSource @Inject constructor(val sharedPref: SharedPreferences) {
         return user != null
     }
 
-    /*
     fun removeUser() =
         sharedPref.edit().remove("USER").apply()
-    */
 }

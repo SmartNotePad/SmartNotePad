@@ -19,6 +19,4 @@ object LocalModule {
     @Provides
     fun provideSharedPrefrences(@ApplicationContext context: Context): SharedPreferences
         = context.getSharedPreferences(PREF_FILE_NAME,Context.MODE_PRIVATE)
-
-
 }

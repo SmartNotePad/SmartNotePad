@@ -1,4 +1,4 @@
-package com.tez.smartnotepad.ui.splash
+package com.tez.smartnotepad.ui.activity.splash
 
 import android.content.Context
 import android.content.Intent
@@ -8,7 +8,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
-import com.tez.smartnotepad.ui.main.MainActivity
+import com.tez.smartnotepad.ui.activity.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

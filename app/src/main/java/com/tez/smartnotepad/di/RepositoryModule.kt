@@ -15,6 +15,7 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun provideNoteRepostiory(noteRepositoryImpl: NoteRepositoryImpl): NoteRepository
 
+
     @Binds
     @Singleton
     abstract fun provideContentRepository(contentRepositoryImpl: ContentRepositoryImpl): ContentRepository

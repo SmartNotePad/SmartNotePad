@@ -1,4 +1,4 @@
-package com.tez.smartnotepad.ui.register
+package com.tez.smartnotepad.ui.fragment.register
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +11,8 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.textfield.TextInputEditText
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.model.UserModel
-import com.tez.smartnotepad.ui.login.LoginFragment
+import com.tez.smartnotepad.ui.fragment.login.LoginFragment
+import com.tez.smartnotepad.util.ext.showMessage
 import com.tez.smartnotepad.vm.RegisterViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -64,7 +65,6 @@ class RegisterFragment : Fragment() {
         return view
     }
 
-
     private fun checkInputs(): Boolean {
         return true
     }
@@ -74,9 +74,5 @@ class RegisterFragment : Fragment() {
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentContainerView, loginFragment)
         transaction.commit()
-    }
-
-    private fun showMessage(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 }

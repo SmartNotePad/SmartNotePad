@@ -1,5 +1,6 @@
 package com.tez.smartnotepad.vm
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tez.smartnotepad.data.model.UserModel
@@ -15,11 +16,11 @@ class LoginViewModel @Inject constructor(val authRepositoryImpl: AuthRepository)
     val user: UserModel
         get() = _user
 
-    fun login(userModel: UserModel, onSuccess: () -> Unit) {
+    fun login(userModel: UserModel, onSuccess: (user:UserModel) -> Unit) {
         makeNetworkRequest(
             requestFunc = { authRepositoryImpl.login(userModel) },
             onSuccess = {
-                onSuccess.invoke()
+                onSuccess.invoke(it)
             }, {}, viewModelScope
         )
     }

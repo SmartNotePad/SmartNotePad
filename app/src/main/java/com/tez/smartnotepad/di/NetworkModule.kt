@@ -19,7 +19,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private var baseUrl: String = "http://192.168.1.20:8080/api/"
+    private var baseUrl: String = "http://192.168.1.22:8080/api/"
 
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {

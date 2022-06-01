@@ -1,4 +1,4 @@
-package com.tez.smartnotepad.ui.newnote
+package com.tez.smartnotepad.ui.fragment.newnote
 
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +14,7 @@ import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.util.ext.name
+import com.tez.smartnotepad.util.ext.showMessage
 import com.tez.smartnotepad.vm.NewNoteViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class NewNoteFragment : Fragment() {
 
 
-    @Inject lateinit var sharedPreferences: PrefDataSource
+    @Inject
+    lateinit var sharedPreferences: PrefDataSource
     val newNoteViewModel: NewNoteViewModel by viewModels()
 
     private lateinit var user: UserModel
@@ -39,7 +41,7 @@ class NewNoteFragment : Fragment() {
 
         user = sharedPreferences.user!! // :(
         newNoteViewModel.createEmptyNote(user)
-        Log.e(name(),user.toString())
+        Log.e(name(), user.toString())
     }
 
     override fun onCreateView(
@@ -65,7 +67,17 @@ class NewNoteFragment : Fragment() {
             etContent.setText(textFromOcrOrVoice)
 
         btnSave.setOnClickListener {
-            newNoteViewModel.createContentAndUpdateTitle(etNoteTitle, etContent, 2,user.userId)
+            newNoteViewModel.createContentAndUpdateTitle(
+                etNoteTitle,
+                etContent,
+                2,
+                user.userId,
+                onSuccess = {
+                    showMessage("Not kaydedildi.")
+                },
+                onError = {
+                    showMessage(it)
+                })
         }
     }
 

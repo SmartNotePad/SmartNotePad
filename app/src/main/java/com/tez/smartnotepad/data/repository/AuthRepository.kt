@@ -9,4 +9,15 @@ interface AuthRepository {
     suspend fun login(user: UserModel): ResultWrapper<UserModel>
 
     suspend fun saveUserToPref(user: UserModel)
+
+    suspend fun updateUser(userData: UserModel): ResultWrapper<UserModel>
+
+    suspend fun removeUserFromPref()
 }
+
+/*
+*
+*
+* interface programming
+*
+* */

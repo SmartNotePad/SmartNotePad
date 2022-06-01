@@ -1,4 +1,4 @@
-package com.tez.smartnotepad.ui.main
+package com.tez.smartnotepad.ui.activity.main
 
 import android.content.Context
 import android.os.Bundle
@@ -6,8 +6,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
-import com.tez.smartnotepad.ui.home.HomeFragment
-import com.tez.smartnotepad.ui.login.LoginFragment
+import com.tez.smartnotepad.ui.fragment.home.HomeFragment
+import com.tez.smartnotepad.ui.fragment.login.LoginFragment
 import com.tez.smartnotepad.util.ext.name
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

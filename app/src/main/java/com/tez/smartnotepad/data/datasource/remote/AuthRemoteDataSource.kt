@@ -14,4 +14,8 @@ class AuthRemoteDataSource @Inject constructor(private val userService: UserServ
     suspend fun login(user: UserModel): ResultWrapper<UserModel>{
         return apiCall { userService.login(user) }
     }
+
+    suspend fun update(userData: UserModel): ResultWrapper<UserModel> {
+        return apiCall { userService.update(userData) }
+    }
 }

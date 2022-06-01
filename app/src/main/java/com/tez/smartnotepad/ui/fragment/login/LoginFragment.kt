@@ -1,4 +1,4 @@
-package com.tez.smartnotepad.ui.login
+package com.tez.smartnotepad.ui.fragment.login
 
 import android.os.Bundle
 import android.util.Log
@@ -12,8 +12,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.data.model.UserModel
-import com.tez.smartnotepad.ui.home.HomeFragment
-import com.tez.smartnotepad.ui.register.RegisterFragment
+import com.tez.smartnotepad.ui.fragment.home.HomeFragment
+import com.tez.smartnotepad.ui.fragment.register.RegisterFragment
 import com.tez.smartnotepad.util.ext.name
 import com.tez.smartnotepad.vm.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,7 +50,7 @@ class LoginFragment : Fragment() {
                 user
             ) {
                 Log.e(name(),user.toString())
-                preferences.user = user
+                preferences.user = it
                 goHomeFragment()
             }
         }

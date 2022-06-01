@@ -1,4 +1,4 @@
-package com.tez.smartnotepad.ui.dialog
+package com.tez.smartnotepad.ui.fragment.dialog
 
 import android.app.Dialog
 import android.os.Bundle

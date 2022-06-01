@@ -1,9 +1,8 @@
-package com.tez.smartnotepad.ui.home
+package com.tez.smartnotepad.ui.fragment.home
 
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -11,13 +10,13 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tez.smartnotepad.R
-import com.tez.smartnotepad.ui.profile.ProfileFragment
+import com.tez.smartnotepad.ui.fragment.profile.ProfileFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-    private lateinit var viewPagerAdapter: viewPagerAdapter
+    private lateinit var viewPagerAdapter: ViewPagerAdapter
     private lateinit var viewPager: ViewPager2
 
     override fun onCreateView(
@@ -31,7 +30,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewPagerAdapter = viewPagerAdapter(this)
+        viewPagerAdapter = ViewPagerAdapter(this)
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = viewPagerAdapter
 
@@ -80,7 +79,7 @@ class HomeFragment : Fragment() {
     }
 }
 
-class viewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class ViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = 2
 

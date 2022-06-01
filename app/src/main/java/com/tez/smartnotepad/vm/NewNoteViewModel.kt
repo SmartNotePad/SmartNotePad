@@ -13,6 +13,7 @@ import com.tez.smartnotepad.data.repository.ContentRepository
 import com.tez.smartnotepad.data.repository.NoteRepository
 import com.tez.smartnotepad.network.helper.Request.makeNetworkRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.lang.Error
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,7 +62,9 @@ class NewNoteViewModel @Inject constructor(
         etTitle: EditText,
         etContent: EditText,
         type: Int,
-        ownerUserId: String
+        ownerUserId: String,
+        onSuccess:()-> Unit,
+        onError:(error:String)-> Unit
     ) {
 
         // fix çözüm. sonra detay giricem.
@@ -86,8 +89,10 @@ class NewNoteViewModel @Inject constructor(
             onSuccess = {
                 Log.e(NewNoteViewModel::class.java.simpleName + " - createContent ", it.toString())
                 updateNoteTitle(etTitle)
+                onSuccess.invoke()
             },
             onError = {
+                onError.invoke(it)
                 Log.e(NewNoteViewModel::class.java.simpleName, " Hata !" + it)
             },
             viewModelScope

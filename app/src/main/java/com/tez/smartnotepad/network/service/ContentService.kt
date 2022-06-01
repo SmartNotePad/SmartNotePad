@@ -20,6 +20,7 @@ interface ContentService {
         @Body content: ContentModel
     ): BaseResponseModel<ContentModel>
 
+    // TODO note service çek
     @GET("notes/get-all-contents-by-note-id-")
     suspend fun getContentsOfNote(
         @Query("id") noteId: Int

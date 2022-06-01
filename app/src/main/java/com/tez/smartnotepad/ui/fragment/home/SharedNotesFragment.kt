@@ -1,10 +1,9 @@
-package com.tez.smartnotepad.ui.home
+package com.tez.smartnotepad.ui.fragment.home
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,8 +21,9 @@ import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.ui.adapter.note.NoteAdapter
-import com.tez.smartnotepad.ui.newnote.NewNoteFragment
-import com.tez.smartnotepad.ui.viewnote.ViewNoteFragment
+import com.tez.smartnotepad.ui.fragment.newnote.NewNoteFragment
+import com.tez.smartnotepad.ui.fragment.viewnote.ViewNoteFragment
+import com.tez.smartnotepad.util.ext.showMessage
 import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,15 +31,15 @@ import java.util.*
 
 
 @AndroidEntryPoint
-class MyNotesFragment : Fragment() {
-
-    val homeViewModel: HomeViewModel by viewModels()
+class SharedNotesFragment : Fragment() {
 
     private lateinit var user: UserModel
     private lateinit var notes: MutableList<NoteModel>
-    private lateinit var noteAdapter: NoteAdapter
 
+    val homeViewModel: HomeViewModel by viewModels()
+    private lateinit var noteAdapter: NoteAdapter
     private var textFromOcrOrVoice: String = ""
+
     private val fabOpen: Animation by lazy {
         AnimationUtils.loadAnimation(
             context,
@@ -82,8 +82,6 @@ class MyNotesFragment : Fragment() {
             null,
             null
         )
-
-
     }
 
     override fun onCreateView(
@@ -124,7 +122,7 @@ class MyNotesFragment : Fragment() {
             displaySpeechRecognizer()
         }
 
-        homeViewModel.getMyNotes {
+        homeViewModel.getSharedNotesWithMe {
             notes = it
             if (notes.isEmpty()) {
                 tvZeroNoteInfo.visibility = View.VISIBLE
@@ -177,13 +175,15 @@ class MyNotesFragment : Fragment() {
 
     private fun deleteNote(position: Int, note: NoteModel) {
 
-        homeViewModel.deleteNote(note, {
-            notes.removeAt(position)
-            noteAdapter.notifyItemRemoved(position)
-            Log.e("Silindi. Run Delete ($position)", note.title)
-        }, {
-            Log.e("Content silinirken Hata", "aasd")
-        })
+        homeViewModel.deleteNote(note,
+            onSuccess = {
+                notes.removeAt(position)
+                noteAdapter.notifyItemRemoved(position)
+                showMessage("Silindi.")
+            },
+            onError = {
+                showMessage(it)
+            })
     }
 
     private val startForSpeechResult = registerForActivityResult(

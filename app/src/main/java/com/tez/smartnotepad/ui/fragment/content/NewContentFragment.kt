@@ -1,23 +1,17 @@
-package com.tez.smartnotepad.ui.content
-
-import androidx.fragment.app.Fragment
+package com.tez.smartnotepad.ui.fragment.content
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.tez.smartnotepad.R
-import com.tez.smartnotepad.network.api.ApiClient
-import com.tez.smartnotepad.data.datasource.remote.ContentRemoteDataSource
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
-import com.tez.smartnotepad.data.repository.ContentRepositoryImpl
-import com.tez.smartnotepad.network.service.ContentService
-import com.tez.smartnotepad.util.ext.name
+import com.tez.smartnotepad.util.ext.showMessage
 import com.tez.smartnotepad.vm.NewContentViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.decodeFromString
@@ -76,11 +70,10 @@ class NewContentFragment : Fragment() {
             newContentViewModel.addContent(user.userId, note.noteId, etContent, 2,
                 onSuccess = {
                     activity?.onBackPressed()
-                    Log.e(name(), "Eklendi")
+                    showMessage("Eklendi")
                 },
                 onError = {
-                    Log.e(name(), "Eklenemedi")
-                    Log.e(name(), it)
+                    showMessage(it)
                 })
         }
     }

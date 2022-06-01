@@ -1,4 +1,4 @@
-package com.tez.smartnotepad.ui.viewnote
+package com.tez.smartnotepad.ui.fragment.viewnote
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
@@ -9,26 +9,24 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.mlkit.vision.common.InputImage
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.ParticipantModel
 import com.tez.smartnotepad.data.model.ShareNoteModel
+import com.tez.smartnotepad.databinding.FragmentViewNoteBinding
 import com.tez.smartnotepad.ui.adapter.content.ContentAdapter
-import com.tez.smartnotepad.ui.content.NewContentFragment
-import com.tez.smartnotepad.ui.dialog.GeneralDialogFragment
-import com.tez.smartnotepad.ui.dialog.ListDialogFragment
+import com.tez.smartnotepad.ui.fragment.content.NewContentFragment
+import com.tez.smartnotepad.ui.fragment.dialog.GeneralDialogFragment
+import com.tez.smartnotepad.ui.fragment.dialog.ListDialogFragment
 import com.tez.smartnotepad.util.ext.name
+import com.tez.smartnotepad.util.ext.showMessage
 import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.ViewNoteViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,11 +40,11 @@ import java.util.*
 class ViewNoteFragment : Fragment() {
 
     private lateinit var note: NoteModel
+    private lateinit var binding: FragmentViewNoteBinding
     val viewNoteViewModel: ViewNoteViewModel by viewModels()
 
     private lateinit var contentAdapter: ContentAdapter
     private lateinit var contents: MutableList<ContentModel>
-    private var textFromOcrOrVoice: String = ""
 
     private val textToSpeechEngine: TextToSpeech by lazy {
         TextToSpeech(activity) {
@@ -59,7 +57,6 @@ class ViewNoteFragment : Fragment() {
         arguments?.let {
             note = Json.decodeFromString(it.getString("selectedNote").toString())
         }
-
         contents = note.contentsContentDtos!!
     }
 
@@ -67,57 +64,51 @@ class ViewNoteFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_view_note, container, false)
+    ): View {
+        binding = FragmentViewNoteBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val noteTitle = view.findViewById<TextView>(R.id.tvNoteTitle)
-        val rvContent = view.findViewById<RecyclerView>(R.id.rvNoteContents)
-        val btnShareNote = view.findViewById<ImageButton>(R.id.btnShareNote)
-        val btnAddContentNormal = view.findViewById<Button>(R.id.btnAddContentText)
-        val btnAddContentWithCamera = view.findViewById<Button>(R.id.btnAddContentCamera)
-        val btnAddContentWithSpeech = view.findViewById<Button>(R.id.btnAddContentVoice)
-        val btnListen = view.findViewById<ImageButton>(R.id.btnListen)
-        val btnRemoveParticipant = view.findViewById<ImageButton>(R.id.btnRemoveParticipant)
-
-        noteTitle.text = note.title
-
-        rvContent.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        rvContent.setHasFixedSize(true)
+        FragmentViewNoteBinding.bind(view)
 
         contentAdapter = initAdapter()
-        rvContent.adapter = contentAdapter
 
-        btnAddContentNormal.setOnClickListener {
-            textFromOcrOrVoice = ""
-            goNewContentFragment()
-        }
+        with(binding) {
+            tvNoteTitle.text = note.title
 
-        btnAddContentWithSpeech.setOnClickListener {
-            displaySpeechRecognizer()
-        }
+            rvNoteContents.layoutManager =
+                LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            rvNoteContents.setHasFixedSize(true) // not sure because of xml item height
 
-        btnAddContentWithCamera.setOnClickListener {
-            displayOcr()
-        }
+            rvNoteContents.adapter = contentAdapter
 
+            btnAddContentText.setOnClickListener {
+                goNewContentFragment("")
+            }
 
-        btnShareNote.setOnClickListener {
-            showShareDialog(onPositive = { mail ->
-                shareNote(mail)
-            })
-        }
+            btnAddContentVoice.setOnClickListener {
+                displaySpeechRecognizer()
+            }
 
-        btnListen.setOnClickListener {
-            speak(contents.toString())
-        }
+            btnAddContentCamera.setOnClickListener {
+                displayOcr()
+            }
 
-        btnRemoveParticipant.setOnClickListener {
-            showRemoveParticipantDialog()
+            btnShareNote.setOnClickListener {
+                showShareDialog(onPositive = { mail ->
+                    shareNote(mail)
+                })
+            }
+
+            btnListen.setOnClickListener {
+                speak(contents.toString())
+            }
+
+            btnRemoveParticipant.setOnClickListener {
+                showRemoveParticipantDialog()
+            }
         }
     }
 
@@ -142,7 +133,9 @@ class ViewNoteFragment : Fragment() {
         viewNoteViewModel.updateContent(changedContent, {
             contents[position] = it
             contentAdapter.notifyItemChanged(position)
+            showMessage("Updated.")
         }, { error ->
+            showMessage(error)
             Log.e(name(), error)
         })
     }
@@ -151,8 +144,10 @@ class ViewNoteFragment : Fragment() {
         viewNoteViewModel.deleteContent(content, {
             contents.removeAt(position)
             contentAdapter.notifyItemRemoved(position)
+            showMessage("Deleted.")
             Log.e("Silindi. Run Delete ($position)", content.context)
         }, {
+            showMessage(it)
             Log.e("Content silinirken Hata", it)
         })
     }
@@ -160,8 +155,10 @@ class ViewNoteFragment : Fragment() {
     private fun shareNote(mail: String) {
         viewNoteViewModel.shareNote(ShareNoteModel(note.userUserId, note.noteId, mail),
             {
+                showMessage("Paylaşıldı.")
                 Log.e(name(), it.toString())
             }, {
+                showMessage(it)
                 Log.e(name(), it)
             })
     }
@@ -189,7 +186,7 @@ class ViewNoteFragment : Fragment() {
         dialogFragment?.show(childFragmentManager, "RemoveParticipant")
     }
 
-    fun displaySpeechRecognizer() {
+    private fun displaySpeechRecognizer() {
         startForSpeechResult.launch(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -198,12 +195,12 @@ class ViewNoteFragment : Fragment() {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("en_US"))
             putExtra(
                 RecognizerIntent.EXTRA_PROMPT,
-                Locale("Hi from the inside of the android on windows. Sanki inception.")
+                Locale("Hi from the inside of the android.")
             )
         })
     }
 
-    fun displayOcr() {
+    private fun displayOcr() {
         val chooseIntent = Intent()
         chooseIntent.type = "image/*"
         chooseIntent.action = Intent.ACTION_GET_CONTENT
@@ -219,8 +216,7 @@ class ViewNoteFragment : Fragment() {
                     .let { text -> text?.get(0) }
 
             if (spokenText != null && spokenText.isNotEmpty()) {
-                textFromOcrOrVoice = spokenText
-                goNewContentFragment()
+                goNewContentFragment(spokenText)
             }
         }
     }
@@ -236,13 +232,12 @@ class ViewNoteFragment : Fragment() {
                 imageUri!!
             )
         ) { text ->
-            textFromOcrOrVoice = text
-            goNewContentFragment()
+            goNewContentFragment(text)
         }
     }
 
-    private fun goNewContentFragment() {
-        val newContentFragment = NewContentFragment.newInstance(textFromOcrOrVoice, note)
+    private fun goNewContentFragment(content: String) {
+        val newContentFragment = NewContentFragment.newInstance(content, note)
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentContainerView, newContentFragment)
         transaction.addToBackStack(NewContentFragment::class.java.simpleName)

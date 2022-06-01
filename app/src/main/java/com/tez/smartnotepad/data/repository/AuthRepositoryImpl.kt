@@ -10,15 +10,22 @@ class AuthRepositoryImpl @Inject constructor(
     private val prefDataSource: PrefDataSource,
     private val authRemoteDataSource: AuthRemoteDataSource
 ) : AuthRepository {
-    override suspend fun register(userModel: UserModel): ResultWrapper<UserModel> {
-        return authRemoteDataSource.register(userModel)
+    override suspend fun register(user: UserModel): ResultWrapper<UserModel> {
+        return authRemoteDataSource.register(user)
     }
 
-    override suspend fun login(userModel: UserModel): ResultWrapper<UserModel> {
-        return authRemoteDataSource.login(userModel)
+    override suspend fun login(user: UserModel): ResultWrapper<UserModel> {
+        return authRemoteDataSource.login(user)
     }
 
     override suspend fun saveUserToPref(user: UserModel) {
         prefDataSource.user = user
     }
+
+    override suspend fun updateUser(userData: UserModel): ResultWrapper<UserModel> {
+        return authRemoteDataSource.update(userData)
+    }
+
+    override suspend fun removeUserFromPref()
+        = prefDataSource.removeUser()
 }
