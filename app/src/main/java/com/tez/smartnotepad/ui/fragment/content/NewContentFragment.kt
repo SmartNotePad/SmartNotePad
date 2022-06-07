@@ -9,20 +9,30 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.tez.smartnotepad.R
+import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
+import com.tez.smartnotepad.databinding.FragmentNewNoteBinding
 import com.tez.smartnotepad.util.ext.showMessage
 import com.tez.smartnotepad.vm.NewContentViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class NewContentFragment : Fragment() {
 
+
+    @Inject
+    lateinit var sharedPreferences: PrefDataSource
+
     private lateinit var user: UserModel
     private lateinit var note: NoteModel
+
+    private var _binding: FragmentNewNoteBinding? = null
+    private val binding get() = _binding!!
 
     val newContentViewModel: NewContentViewModel by viewModels()
 
@@ -36,15 +46,9 @@ class NewContentFragment : Fragment() {
             note = Json.decodeFromString(it.getString("selectedNote").toString())
         }
 
-        user =
-            UserModel(
-                userId = "2",
-                mail = "string1",
-                password = "string",
-                nameSurname = "string",
-                null,
-                null
-            )
+        sharedPreferences.user?.let {
+            this.user = it
+        }
 
     }
 
@@ -52,8 +56,9 @@ class NewContentFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_new_content, container, false)
+    ): View {
+        _binding = FragmentNewNoteBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -87,5 +92,10 @@ class NewContentFragment : Fragment() {
                     putString("selectedNote", Json.encodeToString(note))
                 }
             }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }

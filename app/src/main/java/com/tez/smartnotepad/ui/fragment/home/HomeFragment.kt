@@ -10,6 +10,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tez.smartnotepad.R
+import com.tez.smartnotepad.databinding.FragmentHomeBaseBinding
 import com.tez.smartnotepad.ui.fragment.profile.ProfileFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,51 +18,52 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private lateinit var viewPagerAdapter: ViewPagerAdapter
-    private lateinit var viewPager: ViewPager2
+
+    private var _binding: FragmentHomeBaseBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return  inflater.inflate(R.layout.fragment_home_base, container, false)
+    ): View {
+        _binding = FragmentHomeBaseBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         viewPagerAdapter = ViewPagerAdapter(this)
-        viewPager = view.findViewById(R.id.viewPager)
-        viewPager.adapter = viewPagerAdapter
 
-        val tabLayout: TabLayout = view.findViewById(R.id.tab_layout)
+        with(binding){
 
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            val tabText = when (position) {
-                0 -> {
-                    "My Notes"
+            viewPager.adapter = viewPagerAdapter
+
+            TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+                val tabText = when (position) {
+                    0 -> {
+                        "My Notes"
+                    }
+                    1 -> {
+                        "Shared Notes"
+                    }
+                    else -> {
+                        "Unknown Tab"
+                    }
                 }
-                1 -> {
-                    "Shared Notes"
+
+                tab.text = tabText
+            }.attach()
+
+            topAppBar.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.menuProfile -> {
+                        goProfileFragment()
+                        true
+                    }
+                    else -> super.onOptionsItemSelected(item)
                 }
-                else -> {
-                    "Unknown Tab"
-                }
-            }
-
-            tab.text = tabText
-        }.attach()
-
-
-        val materialToolbar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
-
-        materialToolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.menuProfile -> {
-                    goProfileFragment()
-                    true
-                }
-                else -> super.onOptionsItemSelected(item)
             }
         }
     }
@@ -76,6 +78,11 @@ class HomeFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.top_app_bar, menu)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }
 

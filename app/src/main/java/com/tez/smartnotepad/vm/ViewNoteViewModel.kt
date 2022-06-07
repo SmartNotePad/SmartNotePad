@@ -94,9 +94,13 @@ class ViewNoteViewModel @Inject constructor(
         }, {}, {}, viewModelScope)
     }
 
-    fun removeParticipantUser(participantModel: ParticipantModel) {
+    fun removeParticipantUser(participantModel: ParticipantModel, onSuccess: () -> Unit, onError: (error: String) -> Unit) {
         makeNetworkRequest({
             contentRepositoryImpl.removeParticipant(participantModel)
-        }, {}, {}, viewModelScope)
+        }, {
+           onSuccess.invoke()
+        }, {
+           onError.invoke(it)
+        }, viewModelScope)
     }
 }

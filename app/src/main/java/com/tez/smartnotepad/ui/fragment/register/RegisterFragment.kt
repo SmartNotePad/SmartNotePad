@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.textfield.TextInputEditText
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.model.UserModel
+import com.tez.smartnotepad.databinding.FragmentRegisterBinding
 import com.tez.smartnotepad.ui.fragment.login.LoginFragment
 import com.tez.smartnotepad.util.ext.showMessage
 import com.tez.smartnotepad.vm.RegisterViewModel
@@ -19,50 +17,48 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class RegisterFragment : Fragment() {
 
+    private var _binding: FragmentRegisterBinding? = null
+    private val binding get() = _binding!!
+
     val registerViewModel: RegisterViewModel by viewModels()
 
-    private lateinit var nameSurname: TextInputEditText
-    private lateinit var mail: TextInputEditText
-    private lateinit var password: TextInputEditText
-    private lateinit var passwordAgain: TextInputEditText
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_register, container, false)
+    ): View {
+        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        nameSurname = view.findViewById(R.id.nameSubstituteWrap)
-        mail = view.findViewById(R.id.emailSubstituteWrap)
-        password = view.findViewById(R.id.passwordSubstituteCount)
-        passwordAgain = view.findViewById(R.id.passwordCheckSubstituteCount)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val btnRegister = view.findViewById<Button>(R.id.registerButton)
-        val btnSignInFromInRegister = view.findViewById<Button>(R.id.btnSignInFromInRegister)
+        with(binding){
 
-        btnRegister.setOnClickListener {
-            if (checkInputs()) {
-                val user = UserModel(
-                    "0",
-                    mail.text.toString(),
-                    password.text.toString(),
-                    nameSurname.text.toString(),
-                    null,
-                    null
-                )
-                registerViewModel.register(user, {
-                    goLoginFragment()
-                    showMessage("Giriş yapabilirsiniz.")
-                }, {
-                    showMessage("Yeni üye oluşturulamadı. Mail kullanılıyor.")
-                })
+            registerButton.setOnClickListener {
+                if (checkInputs()) {
+                    val user = UserModel(
+                        "0",
+                        emailSubstituteWrap.text.toString(),
+                        passwordSubstituteCount.text.toString(),
+                        nameSubstituteWrap.text.toString(),
+                        null,
+                        null
+                    )
+                    registerViewModel.register(user, {
+                        goLoginFragment()
+                        showMessage("Giriş yapabilirsiniz.")
+                    }, {
+                        showMessage("Yeni üye oluşturulamadı. Mail kullanılıyor.")
+                    })
+                }
+            }
+
+            btnSignInFromInRegister.setOnClickListener {
+                goLoginFragment()
             }
         }
-
-        btnSignInFromInRegister.setOnClickListener {
-            goLoginFragment()
-        }
-        return view
     }
 
     private fun checkInputs(): Boolean {
@@ -74,5 +70,10 @@ class RegisterFragment : Fragment() {
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragmentContainerView, loginFragment)
         transaction.commit()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }

@@ -40,7 +40,8 @@ import java.util.*
 class ViewNoteFragment : Fragment() {
 
     private lateinit var note: NoteModel
-    private lateinit var binding: FragmentViewNoteBinding
+    private var _binding: FragmentViewNoteBinding? = null
+    private val binding get() = _binding!!
     val viewNoteViewModel: ViewNoteViewModel by viewModels()
 
     private lateinit var contentAdapter: ContentAdapter
@@ -65,7 +66,7 @@ class ViewNoteFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentViewNoteBinding.inflate(inflater, container, false)
+        _binding = FragmentViewNoteBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -179,7 +180,11 @@ class ViewNoteFragment : Fragment() {
 
         val dialogFragment = note.participantUsersUserId?.let { participantUsers ->
             ListDialogFragment(participantUsers) {
-                viewNoteViewModel.removeParticipantUser(participant.copy(participantUsersUserId = it.userId))
+                viewNoteViewModel.removeParticipantUser(
+                    participant.copy(participantUsersUserId = it.userId),{
+                        showMessage("Paylaşımcı silindi")
+                    },{
+                        showMessage(it) })
             }
         }
 
@@ -256,5 +261,10 @@ class ViewNoteFragment : Fragment() {
                     putString("selectedNote", Json.encodeToString(note))
                 }
             }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }

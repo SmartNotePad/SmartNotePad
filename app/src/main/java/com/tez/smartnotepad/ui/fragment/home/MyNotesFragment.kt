@@ -21,6 +21,8 @@ import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
+import com.tez.smartnotepad.databinding.FragmentHomeNotesBinding
+import com.tez.smartnotepad.databinding.FragmentLoginBinding
 import com.tez.smartnotepad.ui.adapter.note.NoteAdapter
 import com.tez.smartnotepad.ui.fragment.newnote.NewNoteFragment
 import com.tez.smartnotepad.ui.fragment.viewnote.ViewNoteFragment
@@ -38,12 +40,16 @@ class MyNotesFragment : Fragment() {
     @Inject
     lateinit var sharedPreferences: PrefDataSource
     private lateinit var user: UserModel
-    val homeViewModel: HomeViewModel by viewModels()
+    private var _binding: FragmentHomeNotesBinding? = null
+    private val binding get() = _binding!!
 
+    val homeViewModel: HomeViewModel by viewModels()
     private lateinit var notes: MutableList<NoteModel>
     private lateinit var noteAdapter: NoteAdapter
 
     private var textFromOcrOrVoice: String = ""
+
+
     private val fabOpen: Animation by lazy {
         AnimationUtils.loadAnimation(
             context,
@@ -70,10 +76,6 @@ class MyNotesFragment : Fragment() {
     }
     private var clicked = true
 
-    private lateinit var btnAddNoteNormal: FloatingActionButton
-    private lateinit var btnAddNoteWithCamera: FloatingActionButton
-    private lateinit var btnAddNoteWithVoice: FloatingActionButton
-    private lateinit var btnAddNote: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,78 +89,81 @@ class MyNotesFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_home_notes, container, false)
+    ): View {
+        _binding =  FragmentHomeNotesBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recy)
         val tvZeroNoteInfo = view.findViewById<TextView>(R.id.tvZeroNoteInfo)
 
-        btnAddNote = view.findViewById(R.id.fab_menu_actions)
-        btnAddNoteNormal = view.findViewById(R.id.fab_menu_add_normal_note)
-        btnAddNoteWithCamera = view.findViewById(R.id.fab_menu_add_camera)
-        btnAddNoteWithVoice = view.findViewById(R.id.fab_menu_add_voice)
+        with(binding){
 
-        recyclerView.layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
+            recy.layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
 
-        btnAddNote.setOnClickListener {
-            initVisibility(clicked)
-            initAnimation(clicked)
-            clicked = !clicked
+
+            fabMenuActions.setOnClickListener {
+                initVisibility(clicked)
+                initAnimation(clicked)
+                clicked = !clicked
+            }
+
+            fabMenuAddNormalNote.setOnClickListener {
+                goNewNoteFragment()
+            }
+
+            fabMenuAddCamera.setOnClickListener {
+                displayOcr()
+            }
+
+            fabMenuAddVoice.setOnClickListener {
+                displaySpeechRecognizer()
+            }
+
+            homeViewModel.getMyNotes {
+                notes = it
+                if (notes.isEmpty()) {
+                    tvZeroNoteInfo.visibility = View.VISIBLE
+                    recy.visibility = View.INVISIBLE
+                } else {
+                    noteAdapter = initAdapter(notes)
+                    recy.adapter = noteAdapter
+                }
+            }
         }
 
-        btnAddNoteNormal.setOnClickListener {
-            goNewNoteFragment()
-        }
 
-        btnAddNoteWithCamera.setOnClickListener {
-            displayOcr()
-        }
 
-        btnAddNoteWithVoice.setOnClickListener {
-            displaySpeechRecognizer()
-        }
+    }
 
-        homeViewModel.getMyNotes {
-            notes = it
-            if (notes.isEmpty()) {
-                tvZeroNoteInfo.visibility = View.VISIBLE
-                recyclerView.visibility = View.INVISIBLE
+    private fun initVisibility(clicked: Boolean) {
+        with(binding){
+            if (clicked) {
+                fabMenuAddNormalNote.visibility = View.VISIBLE
+                fabMenuAddCamera.visibility = View.VISIBLE
+                fabMenuAddVoice.visibility = View.VISIBLE
             } else {
-                noteAdapter = initAdapter(notes)
-                recyclerView.adapter = noteAdapter
+                fabMenuAddNormalNote.visibility = View.GONE
+                fabMenuAddCamera.visibility = View.GONE
+                fabMenuAddVoice.visibility = View.GONE
             }
         }
     }
 
-    private fun initVisibility(clicked: Boolean) {
-
-        if (clicked) {
-            btnAddNoteNormal.visibility = View.VISIBLE
-            btnAddNoteWithCamera.visibility = View.VISIBLE
-            btnAddNoteWithVoice.visibility = View.VISIBLE
-        } else {
-            btnAddNoteNormal.visibility = View.GONE
-            btnAddNoteWithCamera.visibility = View.GONE
-            btnAddNoteWithVoice.visibility = View.GONE
-        }
-    }
-
     private fun initAnimation(clicked: Boolean) {
-        if (clicked) {
-            btnAddNote.startAnimation(fabOpen)
-
-            btnAddNoteNormal.startAnimation(fromBottom)
-            btnAddNoteWithCamera.startAnimation(fromBottom)
-            btnAddNoteWithVoice.startAnimation(fromBottom)
-        } else {
-            btnAddNote.startAnimation(fabClose)
-
-            btnAddNoteNormal.startAnimation(toBottom)
-            btnAddNoteWithCamera.startAnimation(toBottom)
-            btnAddNoteWithVoice.startAnimation(toBottom)
+        with(binding){
+            if (clicked) {
+                fabMenuActions.startAnimation(fabOpen)
+                fabMenuAddNormalNote.startAnimation(fromBottom)
+                fabMenuAddCamera.startAnimation(fromBottom)
+                fabMenuAddVoice.startAnimation(fromBottom)
+            } else {
+                fabMenuActions.startAnimation(fabClose)
+                fabMenuAddNormalNote.startAnimation(toBottom)
+                fabMenuAddCamera.startAnimation(toBottom)
+                fabMenuAddVoice.startAnimation(toBottom)
+            }
         }
     }
 
@@ -250,5 +255,10 @@ class MyNotesFragment : Fragment() {
         transaction.replace(R.id.fragmentContainerView, newNoteFragment)
         transaction.addToBackStack(NewNoteFragment::class.java.simpleName)
         transaction.commit()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }

@@ -12,6 +12,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.tez.smartnotepad.R
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.data.model.UserModel
+import com.tez.smartnotepad.databinding.FragmentLoginBinding
 import com.tez.smartnotepad.ui.fragment.home.HomeFragment
 import com.tez.smartnotepad.ui.fragment.register.RegisterFragment
 import com.tez.smartnotepad.util.ext.name
@@ -26,50 +27,55 @@ class LoginFragment : Fragment() {
     lateinit var preferences: PrefDataSource
     val loginViewModel: LoginViewModel by viewModels()
 
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var user: UserModel
-    private lateinit var mail: TextInputEditText
-    private lateinit var password: TextInputEditText
-    private lateinit var btnSignInFromInLogin: Button
-    private lateinit var btnLogin: Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_login, container, false)
+    ): View {
+        _binding =  FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        mail = view.findViewById(R.id.emailSubstituteWrap)
-        password = view.findViewById(R.id.etSubstituteCount)
-        btnSignInFromInLogin = view.findViewById(R.id.btnSignUpFromInLogin)
-        btnLogin = view.findViewById(R.id.loginButton)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        btnLogin.setOnClickListener {
-            user = getUserFromInputs()
+        with(binding){
 
-            loginViewModel.login(
-                user
-            ) {
-                Log.e(name(),user.toString())
-                preferences.user = it
-                goHomeFragment()
+            loginButton.setOnClickListener {
+                user = getUserFromInputs()
+
+                loginViewModel.login(
+                    user
+                ) {
+                    Log.e(name(),user.toString())
+                    preferences.user = it
+                    goHomeFragment()
+                }
+            }
+
+            btnSignUpFromInLogin.setOnClickListener {
+                goRegisterFragment()
             }
         }
-
-        btnSignInFromInLogin.setOnClickListener {
-            goRegisterFragment()
-        }
-        return view
     }
 
     private fun getUserFromInputs(): UserModel =
-        UserModel(
-            "",
-            mail.text.toString(),
-            password.text.toString(),
-            "",
-            null,
-            null
-        )
+
+        with(binding){
+            UserModel(
+                "",
+                emailSubstituteWrap.text.toString(),
+                etSubstituteCount.text.toString(),
+                "",
+                null,
+                null
+            )
+        }
+
 
     private fun goHomeFragment() {
         val homeFragment = HomeFragment()
@@ -85,4 +91,8 @@ class LoginFragment : Fragment() {
         transaction.commit()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
 }
