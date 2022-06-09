@@ -1,19 +1,12 @@
 package com.tez.smartnotepad.ui.fragment.content
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.tez.smartnotepad.R
+import com.tez.smartnotepad.core.BaseFragmentWithViewModel
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
-import com.tez.smartnotepad.databinding.FragmentNewNoteBinding
-import com.tez.smartnotepad.util.ext.showMessage
+import com.tez.smartnotepad.databinding.FragmentNewContentBinding
 import com.tez.smartnotepad.vm.NewContentViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.decodeFromString
@@ -22,7 +15,10 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class NewContentFragment : Fragment() {
+class NewContentFragment :
+    BaseFragmentWithViewModel<FragmentNewContentBinding, NewContentViewModel>(
+        FragmentNewContentBinding::inflate
+    ) {
 
 
     @Inject
@@ -31,10 +27,7 @@ class NewContentFragment : Fragment() {
     private lateinit var user: UserModel
     private lateinit var note: NoteModel
 
-    private var _binding: FragmentNewNoteBinding? = null
-    private val binding get() = _binding!!
-
-    val newContentViewModel: NewContentViewModel by viewModels()
+    override val viewModel: NewContentViewModel by viewModels()
 
     private lateinit var textFromOcrOrVoice: String
 
@@ -52,34 +45,32 @@ class NewContentFragment : Fragment() {
 
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentNewNoteBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun initViewContent() {
+        with(binding) {
+            if (textFromOcrOrVoice.isNotEmpty())
+                etContent.setText(textFromOcrOrVoice)
+        }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun initListener() {
 
-        val btnSave = view.findViewById<Button>(R.id.btnContentConfirm)
-        val etContent = view.findViewById<EditText>(R.id.etContent)
+        with(binding) {
 
-        if (textFromOcrOrVoice.isNotEmpty())
-            etContent.setText(textFromOcrOrVoice)
+            if (textFromOcrOrVoice.isNotEmpty()) {
+                etContent.setText(textFromOcrOrVoice)
+            }
 
-        btnSave.setOnClickListener {
-
-            newContentViewModel.addContent(user.userId, note.noteId, etContent, 2,
-                onSuccess = {
-                    activity?.onBackPressed()
-                    showMessage("Eklendi")
-                },
-                onError = {
-                    showMessage(it)
-                })
+            btnContentConfirm.setOnClickListener {
+                viewModel.addContent(user.userId, note.noteId, etContent, 2,
+                    onSuccess = {
+                        activity?.onBackPressed()
+                        showMessage("Eklendi")
+                    },
+                    onError = {
+                        showMessage(it)
+                    }
+                )
+            }
         }
     }
 
@@ -92,10 +83,5 @@ class NewContentFragment : Fragment() {
                     putString("selectedNote", Json.encodeToString(note))
                 }
             }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 }

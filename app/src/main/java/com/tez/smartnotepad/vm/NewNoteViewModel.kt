@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tez.smartnotepad.core.BaseViewModel
 import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
@@ -20,7 +21,7 @@ import javax.inject.Inject
 class NewNoteViewModel @Inject constructor(
     private val noteRepositoryImpl: NoteRepository,
     private val contentRepositoryImpl: ContentRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     private var _note = MutableLiveData<NoteModel>()
     val note: LiveData<NoteModel>
