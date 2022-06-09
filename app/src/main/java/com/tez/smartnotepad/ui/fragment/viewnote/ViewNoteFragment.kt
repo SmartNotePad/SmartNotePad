@@ -6,16 +6,13 @@ import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.mlkit.vision.common.InputImage
 import com.tez.smartnotepad.R
+import com.tez.smartnotepad.core.BaseFragmentWithViewModel
 import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.ParticipantModel
@@ -26,7 +23,6 @@ import com.tez.smartnotepad.ui.fragment.content.NewContentFragment
 import com.tez.smartnotepad.ui.fragment.dialog.GeneralDialogFragment
 import com.tez.smartnotepad.ui.fragment.dialog.ListDialogFragment
 import com.tez.smartnotepad.util.ext.name
-import com.tez.smartnotepad.util.ext.showMessage
 import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.ViewNoteViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,12 +33,13 @@ import kotlinx.serialization.json.Json
 import java.util.*
 
 @AndroidEntryPoint
-class ViewNoteFragment : Fragment() {
+class ViewNoteFragment :
+    BaseFragmentWithViewModel<FragmentViewNoteBinding, ViewNoteViewModel>(
+        FragmentViewNoteBinding::inflate
+    ) {
 
     private lateinit var note: NoteModel
-    private var _binding: FragmentViewNoteBinding? = null
-    private val binding get() = _binding!!
-    val viewNoteViewModel: ViewNoteViewModel by viewModels()
+    override val viewModel: ViewNoteViewModel by viewModels()
 
     private lateinit var contentAdapter: ContentAdapter
     private lateinit var contents: MutableList<ContentModel>
@@ -61,30 +58,23 @@ class ViewNoteFragment : Fragment() {
         contents = note.contentsContentDtos!!
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentViewNoteBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun initContentsOfViews() {
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        FragmentViewNoteBinding.bind(view)
-
-        contentAdapter = initAdapter()
+        contentAdapter = initContentAdapter()
 
         with(binding) {
             tvNoteTitle.text = note.title
 
             rvNoteContents.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+
             rvNoteContents.setHasFixedSize(true) // not sure because of xml item height
-
             rvNoteContents.adapter = contentAdapter
+        }
+    }
 
+    override fun initListener() {
+        with(binding) {
             btnAddContentText.setOnClickListener {
                 goNewContentFragment("")
             }
@@ -113,8 +103,7 @@ class ViewNoteFragment : Fragment() {
         }
     }
 
-
-    private fun initAdapter(): ContentAdapter {
+    private fun initContentAdapter(): ContentAdapter {
         return ContentAdapter(
             contents,
             onEditClickListener = { position ->
@@ -131,7 +120,7 @@ class ViewNoteFragment : Fragment() {
     }
 
     private fun updateContent(position: Int, changedContent: ContentModel) {
-        viewNoteViewModel.updateContent(changedContent, {
+        viewModel.updateContent(changedContent, {
             contents[position] = it
             contentAdapter.notifyItemChanged(position)
             showMessage("Updated.")
@@ -142,7 +131,7 @@ class ViewNoteFragment : Fragment() {
     }
 
     private fun deleteContent(position: Int, content: ContentModel) {
-        viewNoteViewModel.deleteContent(content, {
+        viewModel.deleteContent(content, {
             contents.removeAt(position)
             contentAdapter.notifyItemRemoved(position)
             showMessage("Deleted.")
@@ -154,7 +143,7 @@ class ViewNoteFragment : Fragment() {
     }
 
     private fun shareNote(mail: String) {
-        viewNoteViewModel.shareNote(ShareNoteModel(note.userUserId, note.noteId, mail),
+        viewModel.shareNote(ShareNoteModel(note.userUserId, note.noteId, mail),
             {
                 showMessage("Paylaşıldı.")
                 Log.e(name(), it.toString())
@@ -175,19 +164,19 @@ class ViewNoteFragment : Fragment() {
     }
 
     private fun showRemoveParticipantDialog() {
-
+        // buna gerek var mı? burayı kontrol et. copy?
         val participant = ParticipantModel(note.userUserId.toString(), "", note.noteId.toString())
 
         val dialogFragment = note.participantUsersUserId?.let { participantUsers ->
-            ListDialogFragment(participantUsers) {
-                viewNoteViewModel.removeParticipantUser(
-                    participant.copy(participantUsersUserId = it.userId),{
+            ListDialogFragment(participantUsers) { user ->
+                viewModel.removeParticipantUser(
+                    participant.copy(participantUsersUserId = user.userId), {
                         showMessage("Paylaşımcı silindi")
-                    },{
-                        showMessage(it) })
+                    }, {
+                        showMessage(it)
+                    })
             }
         }
-
         dialogFragment?.show(childFragmentManager, "RemoveParticipant")
     }
 
@@ -263,8 +252,4 @@ class ViewNoteFragment : Fragment() {
             }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
 }

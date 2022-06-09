@@ -4,51 +4,44 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.mlkit.vision.common.InputImage
 import com.tez.smartnotepad.R
+import com.tez.smartnotepad.core.BaseFragmentWithViewModel
 import com.tez.smartnotepad.data.datasource.local.PrefDataSource
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.databinding.FragmentHomeNotesBinding
-import com.tez.smartnotepad.databinding.FragmentLoginBinding
 import com.tez.smartnotepad.ui.adapter.note.NoteAdapter
 import com.tez.smartnotepad.ui.fragment.newnote.NewNoteFragment
 import com.tez.smartnotepad.ui.fragment.viewnote.ViewNoteFragment
-import com.tez.smartnotepad.util.ext.showMessage
 import com.tez.smartnotepad.util.ocr.OcrUtils
 import com.tez.smartnotepad.vm.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
-class MyNotesFragment : Fragment() {
+class MyNotesFragment :
+    BaseFragmentWithViewModel<FragmentHomeNotesBinding, HomeViewModel>(
+        FragmentHomeNotesBinding::inflate
+    ) {
 
     @Inject
     lateinit var sharedPreferences: PrefDataSource
     private lateinit var user: UserModel
-    private var _binding: FragmentHomeNotesBinding? = null
-    private val binding get() = _binding!!
 
-    val homeViewModel: HomeViewModel by viewModels()
+    override val viewModel: HomeViewModel by viewModels()
     private lateinit var notes: MutableList<NoteModel>
     private lateinit var noteAdapter: NoteAdapter
 
     private var textFromOcrOrVoice: String = ""
-
 
     private val fabOpen: Animation by lazy {
         AnimationUtils.loadAnimation(
@@ -76,33 +69,31 @@ class MyNotesFragment : Fragment() {
     }
     private var clicked = true
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         sharedPreferences.user?.let {
             this.user = it
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding =  FragmentHomeNotesBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun initContentsOfViews() {
+        with(binding) {
+            recy.layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
+            viewModel.getMyNotes {
+                notes = it
+                if (notes.isEmpty()) {
+                    tvZeroNoteInfo.visibility = View.VISIBLE
+                    recy.visibility = View.INVISIBLE
+                } else {
+                    noteAdapter = initMyNotesAdapter(notes)
+                    recy.adapter = noteAdapter
+                }
+            }
+        }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val tvZeroNoteInfo = view.findViewById<TextView>(R.id.tvZeroNoteInfo)
-
-        with(binding){
-
-            recy.layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
-
-
+    override fun initListener() {
+        with(binding) {
             fabMenuActions.setOnClickListener {
                 initVisibility(clicked)
                 initAnimation(clicked)
@@ -120,25 +111,11 @@ class MyNotesFragment : Fragment() {
             fabMenuAddVoice.setOnClickListener {
                 displaySpeechRecognizer()
             }
-
-            homeViewModel.getMyNotes {
-                notes = it
-                if (notes.isEmpty()) {
-                    tvZeroNoteInfo.visibility = View.VISIBLE
-                    recy.visibility = View.INVISIBLE
-                } else {
-                    noteAdapter = initAdapter(notes)
-                    recy.adapter = noteAdapter
-                }
-            }
         }
-
-
-
     }
 
     private fun initVisibility(clicked: Boolean) {
-        with(binding){
+        with(binding) {
             if (clicked) {
                 fabMenuAddNormalNote.visibility = View.VISIBLE
                 fabMenuAddCamera.visibility = View.VISIBLE
@@ -152,7 +129,7 @@ class MyNotesFragment : Fragment() {
     }
 
     private fun initAnimation(clicked: Boolean) {
-        with(binding){
+        with(binding) {
             if (clicked) {
                 fabMenuActions.startAnimation(fabOpen)
                 fabMenuAddNormalNote.startAnimation(fromBottom)
@@ -167,7 +144,7 @@ class MyNotesFragment : Fragment() {
         }
     }
 
-    private fun initAdapter(notes: List<NoteModel>): NoteAdapter {
+    private fun initMyNotesAdapter(notes: List<NoteModel>): NoteAdapter {
         return NoteAdapter(notes,
             onNoteClickListener = {
                 goViewNoteFragment(this)
@@ -179,7 +156,7 @@ class MyNotesFragment : Fragment() {
 
     private fun deleteNote(position: Int, note: NoteModel) {
 
-        homeViewModel.deleteNote(note,
+        viewModel.deleteNote(note,
             {
                 notes.removeAt(position)
                 noteAdapter.notifyItemRemoved(position)
@@ -255,10 +232,5 @@ class MyNotesFragment : Fragment() {
         transaction.replace(R.id.fragmentContainerView, newNoteFragment)
         transaction.addToBackStack(NewNoteFragment::class.java.simpleName)
         transaction.commit()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 }

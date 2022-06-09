@@ -20,20 +20,17 @@ class NewContentFragment :
         FragmentNewContentBinding::inflate
     ) {
 
-
     @Inject
     lateinit var sharedPreferences: PrefDataSource
 
     private lateinit var user: UserModel
     private lateinit var note: NoteModel
+    private lateinit var textFromOcrOrVoice: String
 
     override val viewModel: NewContentViewModel by viewModels()
 
-    private lateinit var textFromOcrOrVoice: String
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         arguments.let {
             textFromOcrOrVoice = it!!.getString("textFromOcrOrVoiceRecord", "")
             note = Json.decodeFromString(it.getString("selectedNote").toString())
@@ -42,10 +39,9 @@ class NewContentFragment :
         sharedPreferences.user?.let {
             this.user = it
         }
-
     }
 
-    override fun initViewContent() {
+    override fun initContentsOfViews() {
         with(binding) {
             if (textFromOcrOrVoice.isNotEmpty())
                 etContent.setText(textFromOcrOrVoice)
@@ -53,13 +49,7 @@ class NewContentFragment :
     }
 
     override fun initListener() {
-
         with(binding) {
-
-            if (textFromOcrOrVoice.isNotEmpty()) {
-                etContent.setText(textFromOcrOrVoice)
-            }
-
             btnContentConfirm.setOnClickListener {
                 viewModel.addContent(user.userId, note.noteId, etContent, 2,
                     onSuccess = {

@@ -3,6 +3,7 @@ package com.tez.smartnotepad.vm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tez.smartnotepad.core.BaseViewModel
 import com.tez.smartnotepad.data.model.ContentModel
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.ParticipantModel
@@ -15,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ViewNoteViewModel @Inject constructor(
     private val contentRepositoryImpl: ContentRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     fun deleteContent(
         content: ContentModel,

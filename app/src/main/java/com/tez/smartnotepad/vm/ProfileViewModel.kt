@@ -3,6 +3,7 @@ package com.tez.smartnotepad.vm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tez.smartnotepad.core.BaseViewModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.AuthRepository
 import com.tez.smartnotepad.network.helper.Request.makeNetworkRequest
@@ -10,7 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(val authRepository: AuthRepository) : ViewModel() {
+class ProfileViewModel @Inject constructor(val authRepository: AuthRepository) : BaseViewModel() {
 
     fun updateUser(userData: UserModel,onSuccess:()->Unit,onError:(error: String)->Unit) {
 

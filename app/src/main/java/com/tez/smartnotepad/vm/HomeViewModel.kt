@@ -3,6 +3,7 @@ package com.tez.smartnotepad.vm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tez.smartnotepad.core.BaseViewModel
 import com.tez.smartnotepad.data.model.NoteModel
 import com.tez.smartnotepad.data.model.UserModel
 import com.tez.smartnotepad.data.repository.NoteRepository
@@ -14,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val noteRepositoryImpl: NoteRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
 
     val user = UserModel(

@@ -1,45 +1,27 @@
 package com.tez.smartnotepad.ui.fragment.home
 
-import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.tez.smartnotepad.R
+import com.tez.smartnotepad.core.BaseFragment
 import com.tez.smartnotepad.databinding.FragmentHomeBaseBinding
 import com.tez.smartnotepad.ui.fragment.profile.ProfileFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment :
+    BaseFragment<FragmentHomeBaseBinding>(
+        FragmentHomeBaseBinding::inflate
+    ) {
 
-    private lateinit var viewPagerAdapter: ViewPagerAdapter
+    private val viewPagerAdapter = ViewPagerAdapter(this)
 
-    private var _binding: FragmentHomeBaseBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentHomeBaseBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewPagerAdapter = ViewPagerAdapter(this)
-
-        with(binding){
-
+    override fun initContentsOfViews() {
+        with(binding) {
             viewPager.adapter = viewPagerAdapter
-
             TabLayoutMediator(tabLayout, viewPager) { tab, position ->
                 val tabText = when (position) {
                     0 -> {
@@ -52,17 +34,22 @@ class HomeFragment : Fragment() {
                         "Unknown Tab"
                     }
                 }
-
                 tab.text = tabText
             }.attach()
+        }
+    }
 
+    override fun initListener() {
+        with(binding) {
             topAppBar.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.menuProfile -> {
                         goProfileFragment()
                         true
                     }
-                    else -> super.onOptionsItemSelected(item)
+                    else -> {
+                        super.onOptionsItemSelected(item)
+                    }
                 }
             }
         }
@@ -79,26 +66,17 @@ class HomeFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.top_app_bar, menu)
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
 }
 
-class ViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+private class ViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
-        // Return a NEW fragment instance in createFragment(int)
-
-        Log.e("POSITION", position.toString())
         return when (position) {
             0 -> MyNotesFragment()
             1 -> SharedNotesFragment()
             else -> MyNotesFragment()
         }
-
     }
 }

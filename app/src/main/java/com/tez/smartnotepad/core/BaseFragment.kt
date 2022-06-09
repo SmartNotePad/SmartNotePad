@@ -19,7 +19,7 @@ abstract class BaseFragment<VB : ViewBinding>(
 
     open fun initObserver() {}
     open fun initListener() {}
-    open fun initViewContent() {}
+    open fun initContentsOfViews() {}
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,7 +34,7 @@ abstract class BaseFragment<VB : ViewBinding>(
         super.onViewCreated(view, savedInstanceState)
         initObserver()
         initListener()
-        initViewContent()
+        initContentsOfViews()
     }
 
     // TODO change it later from toast to something else.
